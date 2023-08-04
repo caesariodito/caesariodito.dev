@@ -5,7 +5,9 @@ function Description() {
   return (
     <div>
       {/* Heading */}
-      <h1 className="font-bold text-2xl mb-8">wassup, I'm sesar 🙌</h1>
+      <h1 className="font-bold text-2xl mb-8 text-center">
+        wassup, I'm sesar 🙌
+      </h1>
       {/* Brief Description */}
       <p>
         Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sapiente
