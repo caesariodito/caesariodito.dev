@@ -26,3 +26,13 @@ body {
 .app {
   backdrop-filter: blur(20px);
 }
+
+.project-card {
+  max-width: 300px;
+  margin: 20px;
+  transition: transform 0.3s;
+}
+
+.project-card:hover {
+  transform: scale(1.05);
+}

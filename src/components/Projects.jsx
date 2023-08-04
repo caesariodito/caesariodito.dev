@@ -9,7 +9,7 @@ function Projects(props) {
       </div>
       <div className="flex flex-wrap">
         {props.projects.map((project) => (
-          <div className="w-full md:w-1/2 p-2">
+          <div className="w-full md:w-1/2">
             <ProjectCard
               key={project.title}
               link={project.link}
