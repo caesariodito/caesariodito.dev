@@ -10,6 +10,19 @@
 
 body {
   font-family: "Inter", sans-serif;
-  background-color: #202124;
+  background-color: #111010;
   color: white;
+}
+
+.bg {
+  background-image: url("https://cdn.discordapp.com/attachments/1106222232834945084/1106224845001330728/neural.gif");
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.app {
+  backdrop-filter: blur(30px);
 }
