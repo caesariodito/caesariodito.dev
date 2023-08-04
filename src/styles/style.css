@@ -24,5 +24,5 @@ body {
 }
 
 .app {
-  backdrop-filter: blur(30px);
+  backdrop-filter: blur(20px);
 }
