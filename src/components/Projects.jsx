@@ -11,9 +11,11 @@ function Projects(props) {
       </div>
       <div className="flex flex-wrap">
         {props.projects.map((project) => (
-          <div className="w-full h-auto md:w-1/2 flex justify-center">
+          <div
+            key={project.title}
+            className="w-full h-auto md:w-1/2 flex justify-center"
+          >
             <ProjectCard
-              key={project.title}
               link={project.link}
               image={project.image}
               title={project.title}
