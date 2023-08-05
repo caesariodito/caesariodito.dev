@@ -36,3 +36,17 @@ body {
 .project-card:hover {
   transform: scale(1.05);
 }
+
+.dim {
+  opacity: 1;
+  transition: opacity 1s;
+}
+
+.dimHover {
+  opacity: 0.5;
+  transition: opacity 1s;
+}
+
+.ReactGridGallery_tile {
+  background-color: transparent !important;
+}

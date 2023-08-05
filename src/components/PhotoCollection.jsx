@@ -1,46 +1,56 @@
 import React from "react";
 import { Gallery } from "react-grid-gallery";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 
-// TODO add lightbox (optional), source: https://benhowell.github.io/react-grid-gallery/examples/with-react-image-lightbox#source-code
-
-const images = [
-  {
-    src: "https://cdn.discordapp.com/attachments/1105720623143063614/1135557037867155466/IMG_6081.jpg",
-    width: "1227",
-    height: "920",
-  },
-  {
-    src: "https://cdn.discordapp.com/attachments/1105720623143063614/1135558403708686479/IMG-20230625-WA0000.jpg",
-    width: "1227",
-    height: "590",
-  },
-  {
-    src: "https://cdn.discordapp.com/attachments/1105720623143063614/1135557811108069407/IMG-20230629-WA0045.jpg",
-    width: "744",
-    height: "993",
-  },
-  {
-    src: "https://cdn.discordapp.com/attachments/1105720623143063614/1135558403708686479/IMG-20230625-WA0000.jpg",
-    width: "1227",
-    height: "590",
-  },
-  {
-    src: "https://cdn.discordapp.com/attachments/1105720623143063614/1135557037867155466/IMG_6081.jpg",
-    width: "1227",
-    height: "920",
-  },
-  {
-    src: "https://cdn.discordapp.com/attachments/1105720623143063614/1135557811108069407/IMG-20230629-WA0045.jpg",
-    width: "744",
-    height: "993",
-  },
-];
+import images from "../utils/images";
 
 function PhotoCollection() {
+  const handleOnLoad = () => {
+    const images = document.querySelectorAll(".ReactGridGallery_tile");
+    images.forEach((image) => {
+      image.classList.add("dim");
+    });
+  };
+
+  const handleHover = (event) => {
+    if (event.target.tagName === "IMG") {
+      const images = document.querySelectorAll(".ReactGridGallery_tile");
+      images.forEach((image) => {
+        if (image !== event.target.closest(".ReactGridGallery_tile")) {
+          image.classList.add("dimHover");
+        }
+      });
+    }
+  };
+
+  const handleMouseOut = (event) => {
+    if (event.target.tagName === "IMG") {
+      const images = document.querySelectorAll(".ReactGridGallery_tile");
+      images.forEach((image) => {
+        image.classList.remove("dimHover");
+      });
+    }
+  };
+
+  const [open, setOpen] = React.useState(false);
+  const slides = images.map((image) => ({ src: image.src }));
+
   return (
-    <div className="my-8">
+    <div
+      className="dim my-8"
+      onLoad={handleOnLoad}
+      onMouseOver={handleHover}
+      onMouseOut={handleMouseOut}
+    >
       {/* using library */}
-      <Gallery images={images} enableImageSelection={false} />
+      <Gallery
+        images={images}
+        enableImageSelection={false}
+        margin={4}
+        onClick={() => setOpen(true)}
+      />
+      <Lightbox open={open} close={() => setOpen(false)} slides={slides} />
     </div>
   );
 }
