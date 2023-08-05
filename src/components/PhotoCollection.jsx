@@ -34,8 +34,13 @@ function PhotoCollection() {
   };
 
   const [open, setOpen] = React.useState(false);
+  const [currentIndex, setCurrentIndex] = React.useState(0);
   const slides = images.map((image) => ({ src: image.src }));
 
+  const handleClick = (index, item) => {
+    setCurrentIndex(index);
+    setOpen(true);
+  };
   return (
     <div
       className="dim my-8"
@@ -48,9 +53,15 @@ function PhotoCollection() {
         images={images}
         enableImageSelection={false}
         margin={4}
-        onClick={() => setOpen(true)}
+        onClickThumbnail={(index) => setCurrentIndex(index)} // not working, need to fix
+        onClick={handleClick}
       />
-      <Lightbox open={open} close={() => setOpen(false)} slides={slides} />
+      <Lightbox
+        open={open}
+        close={() => setOpen(false)}
+        slides={slides}
+        index={currentIndex}
+      />
     </div>
   );
 }

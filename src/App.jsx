@@ -4,6 +4,7 @@ import Home from "./components/Home";
 import Projects from "./components/Projects";
 
 // TODO add spotlight effect "https://codepen.io/sebastian-piskaty/pen/xxaZYOL"
+// TODO migrate react-grid-gallery to "https://react-photo-album.com/"
 
 import "./styles/style.css";
 
