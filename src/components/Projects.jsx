@@ -5,11 +5,11 @@ function Projects(props) {
   return (
     <>
       <div className="mt-16">
-        <h1 className="font-bold text-2xl mb-4 text-center">Projects</h1>
+        <h1 className="font-extrabold text-2xl mb-4 text-center">Projects</h1>
       </div>
       <div className="flex flex-wrap">
         {props.projects.map((project) => (
-          <div className="w-full md:w-1/2">
+          <div className="w-full h-auto md:w-1/2 flex justify-center">
             <ProjectCard
               key={project.title}
               link={project.link}

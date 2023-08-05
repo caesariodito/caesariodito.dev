@@ -10,18 +10,20 @@ function Description() {
       </h1>
       {/* Brief Description */}
       <p>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sapiente
-        eveniet esse, corrupti deleniti odit velit reprehenderit quisquam hic
-        harum tempore. Sit tenetur consequatur facilis ad veritatis vitae nobis,
-        possimus repudiandae!
+        A third-year undergraduate informatics student with a focus on
+        Intelligent Systems. Experienced in machine learning with tabular data
+        and computer vision and also eager to apply skills to real-world
+        challenges. I can confidently say that I work well in a team environment
+        and adaptable to all challenging situations.
       </p>
+      <br />
       {/* Gallery - Photos */}
       <PhotoCollection />
       {/* Another Brief Description */}
       <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rem non
-        repellat obcaecati? Sunt, nulla? Laudantium possimus vero nostrum vel ab
-        ad suscipit eos, ullam explicabo, eius dolor distinctio ipsa quod?
+        Passionate about self-development and dedicated to sharing personal
+        insights from experiences to help others grow. Believes in the limitless
+        potential for personal growth to be better than yesterday.
       </p>
     </div>
   );
