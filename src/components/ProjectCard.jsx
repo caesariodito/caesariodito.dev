@@ -6,7 +6,7 @@ function ProjectCard({ image, title, description, tags, link }) {
       <a href={link}>
         <img className="w-full h-48 object-cover" src={image} alt={title} />
         <div className="px-6 py-4">
-          <div className="font-bold text-lg font-semibold mb-2">{title}</div>
+          <div className="text-lg font-semibold mb-2">{title}</div>
           <p className="text-gray-400 text-xs line-clamp-2 overflow-ellipsis group-visited:overflow-auto group-hover:overflow-visible group-hover:line-clamp-none transition-all ease-in-out duration-300">
             {description}
           </p>
