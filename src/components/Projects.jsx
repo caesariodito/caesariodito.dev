@@ -4,8 +4,10 @@ import ProjectCard from "./ProjectCard";
 function Projects(props) {
   return (
     <>
-      <div className="mt-16">
-        <h1 className="font-extrabold text-2xl mb-4 text-center">Projects</h1>
+      <div className="projects mt-16">
+        <h1 className="font-extrabold text-2xl mb-4 text-center">
+          projects 💻
+        </h1>
       </div>
       <div className="flex flex-wrap">
         {props.projects.map((project) => (
