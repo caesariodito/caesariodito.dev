@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./components/Home";
 import Projects from "./components/Projects";
 
+// TODO add spotlight effect "https://codepen.io/sebastian-piskaty/pen/xxaZYOL"
+
 import "./styles/style.css";
 
 function App() {
