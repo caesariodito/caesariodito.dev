@@ -6,9 +6,6 @@ import Projects from "./components/Projects";
 // vercel analytics
 import { Analytics } from "@vercel/analytics/react";
 
-// TODO add spotlight effect "https://codepen.io/sebastian-piskaty/pen/xxaZYOL"
-// TODO migrate react-grid-gallery to "https://react-photo-album.com/"
-
 import "./styles/style.css";
 
 function App() {

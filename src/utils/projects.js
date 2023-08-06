@@ -5,8 +5,8 @@ const projects = [
     title: "BDC Competition",
     description:
       "Archive from the BDC Satria Data 2023 Competition | Automatic License Plate Recognition Task.",
-    tags: ["Yolo", "CompVis", "DL"],
-    link: "https://techwaste-ml-preview.streamlit.app/",
+    tags: ["yolo", "compvis", "dl"],
+    link: "https://github.com/caesariodito/comp-satria-data-2023",
   },
   {
     image:
@@ -14,7 +14,7 @@ const projects = [
     title: "Gammafest Competition",
     description:
       "Necessary, Insightful information towards the GAMMAFEST competition.",
-    tags: ["ML", "DL", "Tensorflow"],
+    tags: ["ml", "dl", "tensorflow"],
     link: "https://github.com/caesariodito/comp-gammafest/tree/main/comp",
   },
   {
@@ -23,7 +23,7 @@ const projects = [
     title: "Techwaste ML",
     description:
       "The demo of image classification and summarization capabilities of the Techwaste project.",
-    tags: ["ML", "DL", "Tensorflow"],
+    tags: ["image", "nlp", "dl"],
     link: "https://techwaste-ml-preview.streamlit.app/",
   },
   {
@@ -32,7 +32,7 @@ const projects = [
     title: "Model Deployment",
     description:
       "Experimenting with deployments on the model (boilerplate for cloud computing). Created API with FastAPI and deploy it on Google Cloud Platform for the Techwaste Project.",
-    tags: ["ML", "DL", "Tensorflow"],
+    tags: ["deploy", "gcp", "cloud"],
     link: "https://github.com/Techwaste/try-deploying-model",
   },
   {
@@ -41,7 +41,7 @@ const projects = [
     title: "Techwaste Pitching",
     description:
       "The Bangkit 2023 Capstone Project Pitching of Techwaste. Showcasing our features, technology, and stacks of our project.",
-    tags: ["ML", "DL", "Tensorflow"],
+    tags: ["presentation", "pitching"],
     link: "https://www.youtube.com/watch?v=sUSjhU3-FDk",
   },
   {
@@ -50,7 +50,7 @@ const projects = [
     title: "Assignment Automation",
     description:
       "Personal project designed to demonstrate the power of AI technology in generating answers and insights. (Automate Assignments).",
-    tags: ["GPT", "automation", "OCR"],
+    tags: ["gpt", "automation", "ocr"],
     link: "https://assignment-automation.streamlit.app/",
   },
   {
@@ -59,7 +59,7 @@ const projects = [
     title: "Management System",
     description:
       "A system information management system that can be used to manage information about natural disaster, volunteering, and others.",
-    tags: ["Laravel", "web-app"],
+    tags: ["laravel", "web-app"],
     link: "http://relawan.yeu.or.id/",
   },
   {
