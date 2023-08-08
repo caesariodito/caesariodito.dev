@@ -1,8 +1,8 @@
 import React from "react";
-import Navbar from "./Navbar";
-import Description from "./Description";
-import Projects from "./Projects";
-import Closing from "./Closing";
+import Navbar from "../components/Navbar";
+import Description from "../components/Description";
+import Projects from "../components/Projects";
+import Closing from "../components/Closing";
 
 import projects from "../utils/projects";
 
