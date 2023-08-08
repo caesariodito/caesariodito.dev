@@ -11,9 +11,9 @@ built with tailwind and react.
 
 ## Future Features/Improvement
 
-- [ ] fix bug on project card (mobile view)
+- [x] fix bug on project card (mobile view)
 - [ ] add spotlight effect [[source]](https://codepen.io/sebastian-piskaty/pen/xxaZYOL)
 - [ ] migrate react-grid-gallery to [[source]](https://react-photo-album.com/)
 - [ ] migrate to next.js
-- [ ] add blog feature
+- [ ] add blog
 - [ ] add 'creative' side
