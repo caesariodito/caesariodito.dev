@@ -24,7 +24,7 @@ const projects = [
     description:
       "The demo of image classification and summarization capabilities of the Techwaste project.",
     tags: ["image", "nlp", "dl"],
-    link: "https://techwaste-ml-preview.streamlit.app/",
+    link: "https://techwas-ml-preview.streamlit.app/",
   },
   {
     image:
