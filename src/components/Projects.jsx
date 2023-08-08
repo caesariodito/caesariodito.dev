@@ -13,7 +13,7 @@ function Projects(props) {
         {props.projects.map((project) => (
           <div
             key={project.title}
-            className="w-full h-auto md:w-1/2 flex justify-center"
+            className="w-full md:w-1/2 flex justify-center"
           >
             <ProjectCard
               link={project.link}

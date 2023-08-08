@@ -28,14 +28,13 @@ body {
 }
 
 .project-card {
-  position: relative;
   max-width: 300px;
-  margin: 20px;
+  height: 333px;
   transition: all 0.3s ease-in-out;
 }
 
 .project-card:hover {
-  z-index: 1;
+  height: auto;
   transform: scale(1.05);
 }
 
