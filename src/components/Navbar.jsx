@@ -5,6 +5,7 @@ function Navbar() {
   const links = [
     { to: "/", text: "home" },
     { to: "projects", text: "projects" },
+    { to: "creative", text: "creative" },
   ];
 
   return (
@@ -13,14 +14,23 @@ function Navbar() {
         {links.map((link, index) => (
           <React.Fragment key={link.to}>
             {index !== 0 && <span className="mx-2">/</span>}
-            <Link
-              className="transition-all hover:text-neutral-800 dark:hover:text-neutral-200 flex align-middle px-4 cursor-pointer"
-              to={link.to}
-              smooth={true}
-              duration={800}
-            >
-              {link.text}
-            </Link>
+            {link.to === "projects" ? (
+              <Link
+                className="transition-all hover:text-neutral-800 dark:hover:text-neutral-200 flex align-middle px-4 cursor-pointer"
+                to={link.to}
+                smooth={true}
+                duration={800}
+              >
+                {link.text}
+              </Link>
+            ) : (
+              <a
+                className="transition-all hover:text-neutral-800 dark:hover:text-neutral-200 flex align-middle px-4 cursor-pointer"
+                href={link.to}
+              >
+                {link.text}
+              </a>
+            )}
           </React.Fragment>
         ))}
       </div>
