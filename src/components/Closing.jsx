@@ -5,6 +5,11 @@ function Closing() {
     <>
       <div className="mt-8 w-full bg-gray-300 text-black text-center">
         <p className="font-semibold font-mono">
+          Future construction is in progress. Stay tuned!
+        </p>
+      </div>
+      <div className="mt-8 w-full bg-gray-300 text-black text-center">
+        <p className="font-semibold font-mono">
           "A smooth sea never made a skilled sailor" -Roosevelt
         </p>
       </div>
