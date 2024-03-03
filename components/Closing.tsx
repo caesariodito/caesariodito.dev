@@ -1,22 +1,20 @@
-import React from "react";
-
-function Closing() {
+export default function Closing() {
   return (
     <>
-      <div className="mt-8 w-full bg-gray-300 text-black text-center">
-        <p className="font-semibold font-mono">
+      <div className="mt-8 w-full rounded-md bg-gray-300 p-2 text-center text-black">
+        <p className="font-mono font-semibold">
           Future construction is in progress. Stay tuned!
         </p>
       </div>
-      <div className="mt-8 w-full bg-gray-300 text-black text-center">
-        <p className="font-semibold font-mono">
-          "A smooth sea never made a skilled sailor" -Roosevelt
+      <div className="mt-8 w-full rounded-md bg-gray-300 p-2 text-center text-black">
+        <p className="font-mono font-semibold">
+          &quot;A smooth sea never made a skilled sailor&quot; -Roosevelt
         </p>
       </div>
-      <ul className="flex flex-col md:flex-row mt-8 space-x-0 md:space-x-4 space-y-2 md:space-y-0 font-sm text-neutral-600 dark:text-neutral-300">
+      <ul className="font-sm mt-8 flex flex-col space-x-0 space-y-2 text-neutral-600 md:flex-row md:space-x-4 md:space-y-0 dark:text-neutral-300">
         <li>
           <a
-            className="flex items-center hover:text-neutral-800 dark:hover:text-neutral-100 transition-all"
+            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
             rel="noopener noreferrer"
             target="_blank"
             href="https://linkedin.com/in/caesariodito"
@@ -33,12 +31,12 @@ function Closing() {
                 fill="currentColor"
               ></path>
             </svg>
-            <p className="h-7 ml-2">connect with me on linkedin</p>
+            <p className="ml-2 h-7">connect with me on linkedin</p>
           </a>
         </li>
         <li>
           <a
-            className="flex items-center hover:text-neutral-800 dark:hover:text-neutral-100 transition-all"
+            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
             rel="noopener noreferrer"
             target="_blank"
             href="https://github.com/caesariodito"
@@ -55,12 +53,12 @@ function Closing() {
                 fill="currentColor"
               ></path>
             </svg>
-            <p className="h-7 ml-2">view my github profile</p>
+            <p className="ml-2 h-7">view my github profile</p>
           </a>
         </li>
         <li>
           <a
-            className="flex items-center hover:text-neutral-800 dark:hover:text-neutral-100 transition-all"
+            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
             rel="noopener noreferrer"
             target="_blank"
             href="mailto:caesariodito@gmail.com"
@@ -77,12 +75,10 @@ function Closing() {
                 fill="currentColor"
               ></path>
             </svg>
-            <p className="h-7 ml-2">contact me via email</p>
+            <p className="ml-2 h-7">contact me via email</p>
           </a>
         </li>
       </ul>
     </>
   );
 }
-
-export default Closing;

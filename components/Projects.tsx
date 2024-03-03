@@ -1,19 +1,24 @@
 import React from "react";
 import ProjectCard from "./ProjectCard";
+import { ProjectProp } from "@/lib/project";
 
-function Projects(props) {
+interface ProjectProps {
+  projects: ProjectProp[];
+}
+
+function Projects({ projects }: ProjectProps) {
   return (
     <>
-      <div className="projects mt-16">
-        <h1 className="font-extrabold text-2xl mb-4 text-center">
+      <div id="projects" className="projects mb-4 mt-16">
+        <h1 className="mb-4 text-center text-2xl font-extrabold">
           projects 💻
         </h1>
       </div>
       <div className="flex flex-wrap">
-        {props.projects.map((project) => (
+        {projects.map((project) => (
           <div
             key={project.title}
-            className="w-full md:w-1/2 flex justify-center"
+            className="flex w-full justify-center md:w-1/2"
           >
             <ProjectCard
               link={project.link}
