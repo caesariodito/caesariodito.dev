@@ -4,7 +4,7 @@ import { ImageProp } from "@/lib/images";
 
 export default async function PhotoCollection() {
   const file = await fs.readFile(
-    process.cwd() + "/utils/imagedata.json",
+    process.cwd() + "/utils/imagedatalocal.json",
     "utf8",
   );
 

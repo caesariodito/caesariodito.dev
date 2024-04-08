@@ -7,7 +7,7 @@ import { promises as fs } from "fs";
 
 export default async function Home() {
   const file = await fs.readFile(
-    process.cwd() + "/utils/projectdata.json",
+    process.cwd() + "/utils/projectdatalocal.json",
     "utf8",
   );
   const projects = JSON.parse(file) as ProjectProp[];
