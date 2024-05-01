@@ -19,3 +19,14 @@ built with tailwind and react.
 - [ ] migrate to next.js
 - [ ] add blog
 - [ ] add 'creative' side (unfinished)
+
+## Updated future features
+
+I planned to update my web portfolio so it will be more maintainable. the stacks are:
+- notion (blog)
+- super.site (host)
+- framer.com (host, main website, personalized)
+- next/svelte for first gateaway like carrd.co
+
+try to design using human interface guidelines from apple.
+with this stacks i don't need to worry about maintining it and it will def give high quality content and designs.
