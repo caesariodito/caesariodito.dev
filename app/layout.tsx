@@ -19,6 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script defer data-domain="sesar.my.id" src="https://plausible.sesar.my.id/js/script.js"></script>
+      </head>
       <body className={inter.className}>
         {children}
         <SpeedInsights />
