@@ -1,3 +1,4 @@
+import { redirect } from "next/dist/server/api-utils";
 import Link from "next/link";
 import React from "react";
 
@@ -6,7 +7,11 @@ export default function Navbar() {
     { to: "/", text: "home" },
     { to: "#projects", text: "projects" },
     { to: "https://blog.sesar.my.id/", text: "blog", redirect: true },
-    { to: "creative", text: "creative" },
+    {
+      to: "https://digital-garden.sesar.my.id",
+      text: "digital garden",
+      redirect: true,
+    },
   ];
 
   return (
