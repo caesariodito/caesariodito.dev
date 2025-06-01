@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -19,11 +18,11 @@ const Home = () => {
                 </span>
               </h1>
               <p className="text-xl text-stone-600 dark:text-stone-300 leading-relaxed">
-                Fullstack engineer who believes in the power of mindful growth, 
+                Fullstack engineer who believes in the power of mindful growth,
                 daily reflection, and the 1% better principle.
               </p>
             </div>
-            
+
             <div className="flex flex-wrap gap-4">
               <Link to="/about">
                 <Button className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-full transition-all duration-300 hover:scale-105">
@@ -32,7 +31,10 @@ const Home = () => {
                 </Button>
               </Link>
               <Link to="/projects">
-                <Button variant="outline" className="border-stone-300 dark:border-stone-600 px-6 py-3 rounded-full hover:bg-stone-50 dark:hover:bg-stone-800 transition-all duration-300">
+                <Button
+                  variant="outline"
+                  className="border-stone-300 dark:border-stone-600 px-6 py-3 rounded-full hover:bg-stone-50 dark:hover:bg-stone-800 transition-all duration-300"
+                >
                   View Projects
                 </Button>
               </Link>
@@ -68,11 +70,12 @@ const Home = () => {
                   Balance over Hustle
                 </h3>
                 <p className="text-stone-600 dark:text-stone-400 text-sm">
-                  Sustainable growth through mindful practices and intentional choices.
+                  Sustainable growth through mindful practices and intentional
+                  choices.
                 </p>
               </div>
             </Card>
-            
+
             <Card className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 hover:shadow-lg transition-all duration-300">
               <div className="space-y-3">
                 <div className="text-2xl">📝</div>
@@ -80,11 +83,12 @@ const Home = () => {
                   Reflection over Reactivity
                 </h3>
                 <p className="text-stone-600 dark:text-stone-400 text-sm">
-                  Daily journaling and self-awareness as tools for continuous improvement.
+                  Daily journaling and self-awareness as tools for continuous
+                  improvement.
                 </p>
               </div>
             </Card>
-            
+
             <Card className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 hover:shadow-lg transition-all duration-300">
               <div className="space-y-3">
                 <div className="text-2xl">🌱</div>
@@ -92,7 +96,8 @@ const Home = () => {
                   Progress over Perfection
                 </h3>
                 <p className="text-stone-600 dark:text-stone-400 text-sm">
-                  Every commit is a conversation, every line of code a step forward.
+                  Every commit is a conversation, every line of code a step
+                  forward.
                 </p>
               </div>
             </Card>
@@ -106,11 +111,16 @@ const Home = () => {
           <h2 className="text-2xl font-light text-stone-800 dark:text-stone-100">
             "Build intentionally. Grow quietly. Reflect constantly."
           </h2>
-          <Link to="/journal">
-            <Button variant="outline" className="border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 px-8 py-3 rounded-full">
-              Read My Journal
-            </Button>
-          </Link>
+          <div>
+            <Link to="/journal">
+              <Button
+                variant="outline"
+                className="border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 px-8 py-3 rounded-full"
+              >
+                Read My Journal
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
     </main>

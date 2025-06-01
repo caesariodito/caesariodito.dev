@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "@/components/ThemeProvider";
@@ -27,8 +26,11 @@ const Navigation = () => {
     <nav className="fixed top-0 w-full z-50 bg-white/90 dark:bg-stone-900/90 backdrop-blur-md border-b border-stone-200 dark:border-stone-700">
       <div className="max-w-6xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="text-xl font-medium text-stone-800 dark:text-stone-200 hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
-            Alex Chen
+          <Link
+            to="/"
+            className="text-xl font-medium text-stone-800 dark:text-stone-200 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
+          >
+            Sesar
           </Link>
 
           {/* Desktop Navigation */}
