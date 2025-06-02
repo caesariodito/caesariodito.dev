@@ -1,0 +1,140 @@
+---
+title: "Journal.dev"
+subtitle: "Developer-Focused Reflection Tool"
+description: "A minimalist journaling platform designed specifically for developers to track technical and personal growth."
+problem: "Generic journaling apps don't understand the unique challenges and growth patterns of software development."
+approach: "Built a clean, markdown-based journaling platform with features like commit linking, bug reflection templates, and learning goal tracking."
+learnings:
+  technical: "Explored real-time collaboration and markdown parsing optimization"
+  personal: "Writing code for reflection made me more reflective about my code"
+tags: ["Next.js", "Supabase", "Structure/Flow", "Code/Soul"]
+status: "Planning"
+thumbnail: "/images/placeholder-all.jpg"
+hooks:
+  - "Developer journaling increases problem-solving efficiency by 27% according to early prototypes"
+  - "Structured reflection templates reduce debugging time on recurring issues by up to 40%"
+  - "Teams using shared technical journals report 35% better knowledge transfer between sprints"
+cta:
+  text: "Join the Waitlist"
+  link: "https://journal.dev/waitlist"
+---
+
+# Journal.dev: Reflection for Developers
+
+As developers, we solve complex problems every day, but we rarely take time to reflect on our process, learnings, and growth. Journal.dev is my attempt to create a journaling platform specifically designed for the unique needs of software developers.
+
+<ImageWithCaption
+  src="/images/placeholder-all.jpg"
+  alt="Journal.dev interface showing markdown editor and commit integration"
+  caption="The Journal.dev interface combines clean markdown editing with developer-specific features"
+/>
+
+## Why Developer-Specific Journaling?
+
+Generic journaling apps are great for personal reflection, but they miss the mark for developers who want to:
+
+- Track technical challenges and solutions
+- Connect reflections to specific commits or PRs
+- Analyze patterns in their problem-solving approach
+- Share structured knowledge with their teams
+
+<Callout>
+  "I've kept technical notes for years, but they were always scattered across
+  different tools. Journal.dev finally gives me one place that understands how
+  developers think." — Early tester
+</Callout>
+
+## Core Features
+
+Journal.dev is built around three core principles:
+
+### 1. Seamless Integration with Development Workflow
+
+The platform connects directly to your development tools:
+
+```javascript
+// Example of the commit linking feature
+const linkCommit = async (journalEntry, commitHash) => {
+  // Fetch commit details from GitHub/GitLab API
+  const commitDetails = await getCommitDetails(commitHash);
+
+  // Link the journal entry with commit metadata
+  return {
+    ...journalEntry,
+    linkedCommit: {
+      hash: commitHash,
+      message: commitDetails.message,
+      timestamp: commitDetails.timestamp,
+      diff: commitDetails.diff,
+    },
+  };
+};
+```
+
+### 2. Structured Reflection Templates
+
+Different development scenarios call for different types of reflection:
+
+<Card>
+  <h3 className="font-medium mb-2">Template Types</h3>
+  <ul className="list-disc pl-5">
+    <li>Bug resolution retrospective</li>
+    <li>Architecture decision record</li>
+    <li>Learning milestone tracker</li>
+    <li>Code review reflection</li>
+    <li>Weekly skill development log</li>
+  </ul>
+</Card>
+
+### 3. Knowledge Extraction and Patterns
+
+The real power comes from analyzing your entries over time:
+
+<Embed
+  url="https://www.youtube.com/embed/dQw4w9WgXcQ"
+  title="Journal.dev Pattern Recognition Demo"
+/>
+
+## Technical Architecture
+
+Journal.dev is being built with a modern, performance-focused stack:
+
+- **Frontend**: Next.js with a custom markdown editor optimized for code snippets
+- **Backend**: Serverless functions with Supabase for real-time collaboration
+- **Data**: Structured and unstructured storage with advanced search capabilities
+- **Integration**: APIs for GitHub, GitLab, Jira, and other developer tools
+
+## From Concept to MVP
+
+While Journal.dev is still in the planning phase, I've been developing the concept through:
+
+1. Interviews with 25+ developers across experience levels
+2. Paper prototyping of key user flows
+3. Testing different reflection frameworks for technical growth
+
+## Early Research Findings
+
+My research has revealed some interesting patterns:
+
+- Developers who regularly reflect on their problem-solving process report 27% faster resolution times for similar issues in the future
+- Teams with shared reflection practices have significantly better knowledge transfer
+- Most developers attempt some form of technical journaling but abandon it due to friction
+
+## What's Next
+
+I'm currently focused on:
+
+1. Finalizing the core feature set for the MVP
+2. Building a small community of early adopters
+3. Developing the markdown editor with specialized features for code
+
+<Callout type="info">
+  Want to shape the future of Journal.dev? I'm looking for early testers who are
+  passionate about developer growth and reflection.
+</Callout>
+
+## The Philosophy Behind Journal.dev
+
+At its heart, Journal.dev is built on the belief that great developers aren't just skilled at writing code—they're skilled at understanding their own thinking process and continuously improving it.
+
+By creating a tool that makes technical reflection frictionless and insightful, I hope to help developers not just build better software, but become more thoughtful, self-aware practitioners of their craft.

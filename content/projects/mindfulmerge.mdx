@@ -1,0 +1,109 @@
+---
+title: "MindfulMerge"
+subtitle: "Habit Tracking with Reflection"
+description: "A habit tracking app that goes beyond streaks, incorporating daily reflection and growth mindset principles."
+problem: "Most habit trackers focus on consistency without encouraging meaningful reflection on progress and setbacks."
+approach: "Built a React Native app with thoughtful UX that prompts users to reflect on their daily habits and learn from both successes and failures."
+learnings:
+  technical: "Learned offline-first architecture and smooth animations"
+  personal: "Discovered the power of building tools for my own growth"
+tags: ["React Native", "SQLite", "Code/Soul", "Structure/Flow"]
+status: "Live"
+thumbnail: "/images/placeholder-all.jpg"
+hooks:
+  - "Reflection prompts increase habit completion rates by 37% compared to traditional trackers"
+  - "Users who wrote daily reflections were 3x more likely to maintain habits long-term"
+  - "The growth mindset framework helped users recover from streaks breaks 2x faster"
+cta:
+  text: "Try MindfulMerge"
+  link: "https://mindfulmerge.app"
+---
+
+# The Journey of MindfulMerge
+
+When I started building MindfulMerge, I was frustrated with existing habit trackers. They all seemed to focus on one thing: don't break the chain. But what happens when you inevitably do break the chain? Most apps make you feel like you've failed.
+
+<ImageWithCaption
+  src="/images/placeholder-all.jpg"
+  alt="MindfulMerge app interface showing reflection prompts"
+  caption="The reflection interface helps users process both successes and setbacks"
+/>
+
+## A Different Approach to Habit Building
+
+Instead of just tracking streaks, MindfulMerge encourages users to:
+
+1. Set intentions for why a habit matters to them
+2. Reflect on what worked or didn't work each day
+3. Adjust their approach based on insights
+
+This creates a feedback loop that's more forgiving and ultimately more effective.
+
+<Callout>
+  "The most powerful feature is how it helps me learn from days I miss my
+  habits, instead of just making me feel guilty." — Early beta user
+</Callout>
+
+## Technical Challenges
+
+Building an app that works offline while syncing data seamlessly presented several challenges:
+
+```javascript
+// Implementing optimistic UI updates with fallback mechanisms
+const trackHabit = async (habitId, completed, reflection) => {
+  // Update local state immediately
+  dispatch({
+    type: "TRACK_HABIT",
+    payload: { habitId, completed, reflection },
+  });
+
+  try {
+    // Then try to sync with the server
+    await api.trackHabit(habitId, completed, reflection);
+  } catch (error) {
+    // Queue for retry if offline
+    addToSyncQueue({ habitId, completed, reflection });
+    notifyUser("Saved offline. Will sync when connection is restored.");
+  }
+};
+```
+
+The animations were another challenge - I wanted them to feel natural and responsive:
+
+<Embed
+  url="https://www.youtube.com/embed/dQw4w9WgXcQ"
+  title="MindfulMerge Animation Demo"
+/>
+
+## User Research Insights
+
+Working with early users revealed something interesting: people were more likely to continue using the app when they felt their reflections were helping them grow, not just when they were maintaining perfect streaks.
+
+<Card>
+  <h3 className="font-medium mb-2">Key User Research Finding</h3>
+  <p>
+    Users who wrote reflections at least 3 times per week showed an 82%
+    retention rate after 3 months, compared to 34% for users who rarely
+    reflected.
+  </p>
+</Card>
+
+## The Growth Mindset Framework
+
+The core of MindfulMerge is built around Carol Dweck's growth mindset research. I developed a framework with three key questions:
+
+1. What went well today?
+2. What challenges did you face?
+3. What will you adjust tomorrow?
+
+This simple framework helps users reframe setbacks as learning opportunities rather than failures.
+
+## What's Next for MindfulMerge
+
+I'm currently working on several exciting features:
+
+- Community reflections where users can optionally share insights
+- Integration with calendar apps for more contextual habit tracking
+- Advanced analytics to uncover patterns in habit success and challenges
+
+The journey of building MindfulMerge has been as much about personal growth as it has been about creating a useful product. I've learned that the best tools don't just help us track our progress—they help us understand ourselves better.

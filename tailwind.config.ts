@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
+import typography from "@tailwindcss/typography";
 
 const config: Config = {
   darkMode: ["class"],
@@ -8,6 +9,7 @@ const config: Config = {
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
+    "./content/**/*.{md,mdx}",
   ],
   prefix: "",
   theme: {
@@ -99,15 +101,85 @@ const config: Config = {
             transform: "translateY(0)",
           },
         },
+        "float-slow": {
+          "0%, 100%": {
+            transform: "translateY(0px) translateX(0px)",
+          },
+          "50%": {
+            transform: "translateY(-10px) translateX(5px)",
+          },
+        },
+        "float-medium": {
+          "0%, 100%": {
+            transform: "translateY(0px) translateX(0px)",
+          },
+          "50%": {
+            transform: "translateY(-15px) translateX(-7px)",
+          },
+        },
+        "float-fast": {
+          "0%, 100%": {
+            transform: "translateY(0px) translateX(0px)",
+          },
+          "50%": {
+            transform: "translateY(-8px) translateX(10px)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.6s ease-out",
+        "float-slow": "float-slow 5s ease-in-out infinite",
+        "float-medium": "float-medium 4s ease-in-out infinite",
+        "float-fast": "float-fast 3s ease-in-out infinite",
+      },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: "100%",
+            color: "hsl(var(--foreground))",
+            a: {
+              color: "hsl(var(--primary))",
+              "&:hover": {
+                color: "hsl(var(--primary))",
+              },
+            },
+            h1: {
+              color: "hsl(var(--foreground))",
+            },
+            h2: {
+              color: "hsl(var(--foreground))",
+            },
+            h3: {
+              color: "hsl(var(--foreground))",
+            },
+            h4: {
+              color: "hsl(var(--foreground))",
+            },
+            blockquote: {
+              borderLeftColor: "hsl(var(--primary))",
+              color: "hsl(var(--muted-foreground))",
+            },
+            hr: {
+              borderColor: "hsl(var(--border))",
+            },
+            pre: {
+              backgroundColor: "hsl(var(--muted))",
+              color: "hsl(var(--muted-foreground))",
+            },
+            code: {
+              color: "hsl(var(--foreground))",
+            },
+            strong: {
+              color: "hsl(var(--foreground))",
+            },
+          },
+        },
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [tailwindcssAnimate, typography],
 };
 
 export default config;
