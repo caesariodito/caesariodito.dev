@@ -19,7 +19,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
   const { frontmatter, content } = getProjectWithContent(slug);
 
   return (
-    <main className="pt-16 md:pt-20 pb-16 overflow-hidden">
+    <main className="pt-16 md:pt-20 pb-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Navigation */}
         <div className="mb-6 md:mb-8">
@@ -84,7 +84,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
         {/* Main content */}
         <div className="grid lg:grid-cols-12 gap-8 md:gap-12">
           {/* Left column - Main content */}
-          <div className="lg:col-span-8 space-y-6 md:space-y-8">
+          <div className="lg:col-span-8 order-1 space-y-6 md:space-y-8">
             {/* Featured Image */}
             <div className="rounded-xl overflow-hidden">
               <Image
@@ -125,7 +125,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
           </div>
 
           {/* Right column - What I Learned */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 order-2">
             <div className="lg:sticky lg:top-24 space-y-6 md:space-y-8">
               <div className="bg-gradient-to-br from-amber-50 to-stone-50 dark:from-amber-900/10 dark:to-stone-800 p-4 md:p-6 rounded-2xl">
                 <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-4">
