@@ -53,13 +53,13 @@ interface EmbedProps {
 
 const Embed = ({ url, title }: EmbedProps) => {
   return (
-    <div className="aspect-w-16 aspect-h-9 my-8">
+    <div className="relative w-full pb-[56.25%] my-6 md:my-8 overflow-hidden">
       <iframe
         src={url}
         title={title || "Embedded content"}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        className="w-full h-full rounded-lg"
+        className="absolute top-0 left-0 w-full h-full rounded-lg"
       />
     </div>
   );
@@ -81,7 +81,7 @@ const ImageWithCaption = ({
   height = 630,
 }: ImageWithCaptionProps) => {
   return (
-    <figure className="my-8">
+    <figure className="my-6 md:my-8">
       <div className="overflow-hidden rounded-lg">
         <Image
           src={src}
@@ -92,7 +92,7 @@ const ImageWithCaption = ({
         />
       </div>
       {caption && (
-        <figcaption className="text-sm text-center mt-2 text-stone-500 dark:text-stone-400">
+        <figcaption className="text-xs md:text-sm text-center mt-2 text-stone-500 dark:text-stone-400">
           {typeof caption === "string" ? caption : unwrapParagraphs(caption)}
         </figcaption>
       )}
@@ -107,7 +107,7 @@ interface CodeBlockProps {
 
 const CodeBlock = ({ children, language }: CodeBlockProps) => {
   return (
-    <pre className="bg-stone-800 text-stone-100 p-4 rounded-lg overflow-x-auto my-6">
+    <pre className="bg-stone-800 text-stone-100 p-3 md:p-4 rounded-lg overflow-x-auto text-sm my-4 md:my-6">
       <code className={language ? `language-${language}` : ""}>{children}</code>
     </pre>
   );
