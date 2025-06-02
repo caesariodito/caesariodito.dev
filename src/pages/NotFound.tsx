@@ -1,5 +1,6 @@
+"use client";
 
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -11,7 +12,7 @@ const NotFound = () => {
           <Card className="p-12 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700">
             <div className="space-y-8">
               <div className="text-6xl">🧭</div>
-              
+
               <div className="space-y-4">
                 <h1 className="text-4xl font-light text-stone-800 dark:text-stone-100">
                   Out of Balance
@@ -23,22 +24,26 @@ const NotFound = () => {
 
               <div className="space-y-4 text-stone-600 dark:text-stone-300">
                 <p>
-                  Like a misaligned algorithm or a broken reference, 
-                  this URL leads to nowhere meaningful.
+                  Like a misaligned algorithm or a broken reference, this URL
+                  leads to nowhere meaningful.
                 </p>
                 <p className="italic">
-                  But every 404 is an opportunity to recenter and choose a better path.
+                  But every 404 is an opportunity to recenter and choose a
+                  better path.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/">
+                <Link href="/">
                   <Button className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-full">
                     Return Home
                   </Button>
                 </Link>
-                <Link to="/journal">
-                  <Button variant="outline" className="border-stone-300 dark:border-stone-600 px-6 py-3 rounded-full">
+                <Link href="/journal">
+                  <Button
+                    variant="outline"
+                    className="border-stone-300 dark:border-stone-600 px-6 py-3 rounded-full"
+                  >
                     Read Journal
                   </Button>
                 </Link>

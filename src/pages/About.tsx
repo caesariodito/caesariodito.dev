@@ -1,3 +1,4 @@
+"use client";
 
 import { Card } from "@/components/ui/card";
 
@@ -6,33 +7,38 @@ const About = () => {
     {
       year: "2018",
       title: "The Beginning",
-      description: "Started my journey in computer science, drawn to the logical beauty of code.",
-      reflection: "Every problem had a solution waiting to be discovered."
+      description:
+        "Started my journey in computer science, drawn to the logical beauty of code.",
+      reflection: "Every problem had a solution waiting to be discovered.",
     },
     {
       year: "2020",
       title: "First Burnout",
-      description: "Learned the hard way that grinding 16-hour days wasn't sustainable.",
-      reflection: "This was my first lesson in the importance of balance."
+      description:
+        "Learned the hard way that grinding 16-hour days wasn't sustainable.",
+      reflection: "This was my first lesson in the importance of balance.",
     },
     {
       year: "2021",
       title: "Discovery of Mindfulness",
-      description: "Started journaling and meditation practices. Everything changed.",
-      reflection: "Code became meditation. Debugging became self-reflection."
+      description:
+        "Started journaling and meditation practices. Everything changed.",
+      reflection: "Code became meditation. Debugging became self-reflection.",
     },
     {
       year: "2023",
       title: "The 1% Philosophy",
-      description: "Embraced atomic habits and daily improvement over dramatic changes.",
-      reflection: "Small commits, big transformations."
+      description:
+        "Embraced atomic habits and daily improvement over dramatic changes.",
+      reflection: "Small commits, big transformations.",
     },
     {
       year: "2024",
       title: "Present Moment",
-      description: "Building software with intention, growing through reflection.",
-      reflection: "Every day is a chance to merge wisdom with code."
-    }
+      description:
+        "Building software with intention, growing through reflection.",
+      reflection: "Every day is a chance to merge wisdom with code.",
+    },
   ];
 
   return (
@@ -44,7 +50,7 @@ const About = () => {
             The Journey
           </h1>
           <p className="text-xl text-stone-600 dark:text-stone-300 leading-relaxed max-w-3xl mx-auto">
-            A story of technical growth intertwined with personal discovery, 
+            A story of technical growth intertwined with personal discovery,
             where engineering discipline meets mindful philosophy.
           </p>
         </section>
@@ -57,15 +63,18 @@ const About = () => {
                 Beyond the Code
               </h2>
               <p className="text-stone-600 dark:text-stone-300 leading-relaxed">
-                I believe that the best software comes from developers who understand themselves. 
-                My daily practice includes morning journaling, where I reflect on yesterday's learnings 
-                and set intentions for today's work. This isn't just self-help—it's a systematic 
-                approach to continuous improvement that applies to both personal growth and code quality.
+                I believe that the best software comes from developers who
+                understand themselves. My daily practice includes morning
+                journaling, where I reflect on yesterday's learnings and set
+                intentions for today's work. This isn't just self-help—it's a
+                systematic approach to continuous improvement that applies to
+                both personal growth and code quality.
               </p>
               <p className="text-stone-600 dark:text-stone-300 leading-relaxed">
-                Every commit I make is intentional. Every feature I build serves a purpose. 
-                Every bug I fix teaches me something new—not just about the codebase, but about patience, 
-                problem-solving, and the importance of approaching challenges with a calm mind.
+                Every commit I make is intentional. Every feature I build serves
+                a purpose. Every bug I fix teaches me something new—not just
+                about the codebase, but about patience, problem-solving, and the
+                importance of approaching challenges with a calm mind.
               </p>
             </div>
           </Card>

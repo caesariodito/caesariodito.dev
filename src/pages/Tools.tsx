@@ -1,3 +1,4 @@
+"use client";
 
 import { Card } from "@/components/ui/card";
 
@@ -9,23 +10,26 @@ const Tools = () => {
       tools: [
         {
           name: "React",
-          purpose: "Component-based thinking mirrors how I approach life problems",
-          reflection: "Breaking complex challenges into smaller, manageable pieces",
-          philosophy: "State management teaches patience with change"
+          purpose:
+            "Component-based thinking mirrors how I approach life problems",
+          reflection:
+            "Breaking complex challenges into smaller, manageable pieces",
+          philosophy: "State management teaches patience with change",
         },
         {
           name: "TypeScript",
           purpose: "Clarity in intention, safety in execution",
           reflection: "Types force me to think deeply about data relationships",
-          philosophy: "Structure enables creativity, constraints spark innovation"
+          philosophy:
+            "Structure enables creativity, constraints spark innovation",
         },
         {
           name: "Tailwind CSS",
           purpose: "Utility-first approach to styling and consistency",
           reflection: "Small, composable classes mirror atomic habits",
-          philosophy: "Systematic design systems create coherent experiences"
-        }
-      ]
+          philosophy: "Systematic design systems create coherent experiences",
+        },
+      ],
     },
     {
       category: "Backend Foundation",
@@ -35,21 +39,22 @@ const Tools = () => {
           name: "Node.js",
           purpose: "Event-driven architecture for responsive applications",
           reflection: "Asynchronous thinking applies to work-life balance",
-          philosophy: "Non-blocking operations remind me to stay present"
+          philosophy: "Non-blocking operations remind me to stay present",
         },
         {
           name: "PostgreSQL",
           purpose: "Relational thinking and data integrity",
-          reflection: "Database design teaches me about relationships and constraints",
-          philosophy: "ACID properties mirror personal values of reliability"
+          reflection:
+            "Database design teaches me about relationships and constraints",
+          philosophy: "ACID properties mirror personal values of reliability",
         },
         {
           name: "Docker",
           purpose: "Consistent environments and reproducible builds",
           reflection: "Containerization parallels setting healthy boundaries",
-          philosophy: "Isolation enables both security and clarity"
-        }
-      ]
+          philosophy: "Isolation enables both security and clarity",
+        },
+      ],
     },
     {
       category: "Development Flow",
@@ -59,21 +64,23 @@ const Tools = () => {
           name: "VS Code",
           purpose: "Customizable workspace that adapts to my thinking style",
           reflection: "Extensions mirror how I build supportive habits",
-          philosophy: "The right environment amplifies natural capabilities"
+          philosophy: "The right environment amplifies natural capabilities",
         },
         {
           name: "Git",
           purpose: "Version control as a philosophy of iterative improvement",
           reflection: "Commits are like journal entries for code",
-          philosophy: "History teaches, branches explore, merges integrate wisdom"
+          philosophy:
+            "History teaches, branches explore, merges integrate wisdom",
         },
         {
           name: "Linear",
           purpose: "Issue tracking that feels thoughtful, not overwhelming",
           reflection: "Organized workflows reduce mental clutter",
-          philosophy: "Good tools disappear, leaving only the work that matters"
-        }
-      ]
+          philosophy:
+            "Good tools disappear, leaving only the work that matters",
+        },
+      ],
     },
     {
       category: "Mindful Productivity",
@@ -82,23 +89,24 @@ const Tools = () => {
         {
           name: "Obsidian",
           purpose: "Connected thinking and knowledge management",
-          reflection: "Links between ideas mirror how learning actually happens",
-          philosophy: "External mind-mapping enables internal clarity"
+          reflection:
+            "Links between ideas mirror how learning actually happens",
+          philosophy: "External mind-mapping enables internal clarity",
         },
         {
           name: "Day One",
           purpose: "Daily journaling and reflection practice",
           reflection: "Writing clarifies thinking, documents growth",
-          philosophy: "The unexamined code is not worth committing"
+          philosophy: "The unexamined code is not worth committing",
         },
         {
           name: "RescueTime",
           purpose: "Mindful awareness of time and attention patterns",
           reflection: "Data reveals unconscious habits and flow states",
-          philosophy: "What gets measured gets reflected upon"
-        }
-      ]
-    }
+          philosophy: "What gets measured gets reflected upon",
+        },
+      ],
+    },
   ];
 
   return (
@@ -110,8 +118,8 @@ const Tools = () => {
             Thoughtful Tools
           </h1>
           <p className="text-xl text-stone-600 dark:text-stone-300 leading-relaxed max-w-3xl mx-auto">
-            Every tool in my stack serves a purpose beyond functionality—each teaches me something 
-            about craft, reflection, or intentional growth.
+            Every tool in my stack serves a purpose beyond functionality—each
+            teaches me something about craft, reflection, or intentional growth.
           </p>
         </section>
 
@@ -130,7 +138,10 @@ const Tools = () => {
 
               <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {category.tools.map((tool, toolIndex) => (
-                  <Card key={toolIndex} className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 hover:shadow-lg transition-all duration-300">
+                  <Card
+                    key={toolIndex}
+                    className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 hover:shadow-lg transition-all duration-300"
+                  >
                     <div className="space-y-4">
                       <div>
                         <h3 className="text-xl font-medium text-stone-800 dark:text-stone-200 mb-2">
@@ -150,7 +161,7 @@ const Tools = () => {
                             {tool.reflection}
                           </p>
                         </div>
-                        
+
                         <div>
                           <h4 className="text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
                             Philosophy
@@ -177,18 +188,21 @@ const Tools = () => {
               </h2>
               <div className="max-w-3xl mx-auto space-y-4 text-stone-600 dark:text-stone-300 leading-relaxed">
                 <p>
-                  I don't chase the latest frameworks or tools just because they're new. Instead, 
-                  I choose technologies that align with my values: simplicity over complexity, 
-                  sustainability over speed, and tools that make me think better rather than just work faster.
+                  I don't chase the latest frameworks or tools just because
+                  they're new. Instead, I choose technologies that align with my
+                  values: simplicity over complexity, sustainability over speed,
+                  and tools that make me think better rather than just work
+                  faster.
                 </p>
                 <p>
-                  Each tool in my stack has earned its place not just through technical merit, 
-                  but by enhancing my ability to create thoughtfully, reflect meaningfully, 
-                  and grow continuously.
+                  Each tool in my stack has earned its place not just through
+                  technical merit, but by enhancing my ability to create
+                  thoughtfully, reflect meaningfully, and grow continuously.
                 </p>
               </div>
               <blockquote className="text-lg text-stone-700 dark:text-stone-300 italic">
-                "The tools we choose shape not just our code, but our thinking patterns."
+                "The tools we choose shape not just our code, but our thinking
+                patterns."
               </blockquote>
             </div>
           </Card>
@@ -207,23 +221,32 @@ const Tools = () => {
 
           <div className="grid md:grid-cols-3 gap-6">
             <Card className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700">
-              <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-2">Rust</h3>
+              <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
+                Rust
+              </h3>
               <p className="text-stone-600 dark:text-stone-300 text-sm">
-                Learning systems programming with a language that teaches memory safety and performance mindfulness.
+                Learning systems programming with a language that teaches memory
+                safety and performance mindfulness.
               </p>
             </Card>
-            
+
             <Card className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700">
-              <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-2">Svelte</h3>
+              <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
+                Svelte
+              </h3>
               <p className="text-stone-600 dark:text-stone-300 text-sm">
-                Exploring reactive frameworks that prioritize simplicity and compile-time optimizations.
+                Exploring reactive frameworks that prioritize simplicity and
+                compile-time optimizations.
               </p>
             </Card>
-            
+
             <Card className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700">
-              <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-2">Deno</h3>
+              <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
+                Deno
+              </h3>
               <p className="text-stone-600 dark:text-stone-300 text-sm">
-                Investigating modern runtime environments that embrace web standards and security by default.
+                Investigating modern runtime environments that embrace web
+                standards and security by default.
               </p>
             </Card>
           </div>

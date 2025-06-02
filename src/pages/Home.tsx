@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
@@ -24,13 +26,13 @@ const Home = () => {
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <Link to="/about">
+              <Link href="/about">
                 <Button className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-full transition-all duration-300 hover:scale-105">
                   My Story
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link to="/projects">
+              <Link href="/projects">
                 <Button
                   variant="outline"
                   className="border-stone-300 dark:border-stone-600 px-6 py-3 rounded-full hover:bg-stone-50 dark:hover:bg-stone-800 transition-all duration-300"
@@ -112,7 +114,7 @@ const Home = () => {
             "Build intentionally. Grow quietly. Reflect constantly."
           </h2>
           <div>
-            <Link to="/journal">
+            <Link href="/journal">
               <Button
                 variant="outline"
                 className="border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 px-8 py-3 rounded-full"
