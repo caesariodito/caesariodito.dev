@@ -2,10 +2,11 @@ import { getProjectSlugs, getProjectWithContent } from "@/lib/mdx";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import MDXComponents from "@/components/MDXComponents";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import BackToTopButton from "@/components/BackToTopButton";
+import { formatDate } from "@/lib/utils";
 
 // Generate static params for all project slugs
 export async function generateStaticParams() {
@@ -40,6 +41,22 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
             {frontmatter.subtitle}
           </p>
 
+          {/* Date and Featured */}
+          <div className="flex items-center gap-4 mb-4">
+            {frontmatter.date && (
+              <div className="flex items-center text-stone-500 dark:text-stone-400">
+                <Calendar size={16} className="mr-1" />
+                <span>{formatDate(frontmatter.date)}</span>
+              </div>
+            )}
+            {frontmatter.featured && (
+              <div className="flex items-center text-amber-500 dark:text-amber-400">
+                <Star size={16} className="mr-1" />
+                <span>Featured Project</span>
+              </div>
+            )}
+          </div>
+
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-6 md:mb-8">
             {frontmatter.tags.map((tag, index) => (
@@ -65,9 +82,9 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
         </header>
 
         {/* Main content */}
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 lg:gap-12">
+        <div className="grid lg:grid-cols-12 gap-8 md:gap-12">
           {/* Left column - Main content */}
-          <div className="lg:col-span-7 space-y-6 md:space-y-8">
+          <div className="lg:col-span-8 space-y-6 md:space-y-8">
             {/* Featured Image */}
             <div className="rounded-xl overflow-hidden">
               <Image
@@ -108,7 +125,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
           </div>
 
           {/* Right column - What I Learned */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-4">
             <div className="lg:sticky lg:top-24 space-y-6 md:space-y-8">
               <div className="bg-gradient-to-br from-amber-50 to-stone-50 dark:from-amber-900/10 dark:to-stone-800 p-4 md:p-6 rounded-2xl">
                 <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-4">

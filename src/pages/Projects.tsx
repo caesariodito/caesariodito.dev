@@ -2,11 +2,19 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Code, Lightbulb, RefreshCw, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Code,
+  Lightbulb,
+  RefreshCw,
+  Sparkles,
+  Calendar,
+} from "lucide-react";
 import { useState, useRef, MouseEvent, useEffect } from "react";
 import Link from "next/link";
 import { ProjectFrontmatter } from "@/lib/mdx";
 import { useRouter } from "next/navigation";
+import { formatDate } from "@/lib/utils";
 
 const Projects = () => {
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
@@ -20,7 +28,7 @@ const Projects = () => {
   useEffect(() => {
     setIsLoading(true);
     // In a client component, we need to fetch the data from an API endpoint
-    fetch("/api/projects")
+    fetch("/api/projects?featured=true&limit=3")
       .then((res) => res.json())
       .then((data) => {
         setProjects(data);
@@ -170,21 +178,32 @@ const Projects = () => {
                         <h2 className="text-2xl font-medium text-stone-800 dark:text-stone-200 border-b-2 border-amber-400 dark:border-amber-600 inline-block pb-1">
                           {project.title}
                         </h2>
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            project.status === "Live"
-                              ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                              : project.status === "Beta"
-                              ? "bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
-                              : "bg-stone-100 text-stone-700 dark:bg-stone-700 dark:text-stone-300"
-                          }`}
-                        >
-                          {project.status}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              project.status === "Live"
+                                ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                                : project.status === "Beta"
+                                ? "bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
+                                : "bg-stone-100 text-stone-700 dark:bg-stone-700 dark:text-stone-300"
+                            }`}
+                          >
+                            {project.status}
+                          </span>
+                          {project.featured && (
+                            <span className="text-amber-500 dark:text-amber-400">
+                              <Sparkles size={16} />
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <p className="text-lg text-amber-600 dark:text-amber-400 mb-4">
                         {project.subtitle}
                       </p>
+                      <div className="flex items-center text-stone-500 dark:text-stone-400 text-sm mb-4">
+                        <Calendar size={14} className="mr-1" />
+                        {project.date ? formatDate(project.date) : "No date"}
+                      </div>
                       <p className="text-stone-600 dark:text-stone-300 leading-relaxed">
                         {project.description}
                       </p>
@@ -262,6 +281,18 @@ const Projects = () => {
             ))
           )}
         </section>
+
+        {/* View All Projects Button */}
+        <div className="mt-8 text-center">
+          <Link href="/project-gallery">
+            <Button
+              variant="outline"
+              className="border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+            >
+              View All Projects <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+          </Link>
+        </div>
 
         {/* Call to Action */}
         <section className="py-16 text-center">
