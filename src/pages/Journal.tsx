@@ -134,7 +134,7 @@ const Journal = () => {
 
               <div className="flex justify-center">
                 <Button
-                  onClick={() => router.push("/graph-view")}
+                  onClick={() => router.push("/journal-explorer")}
                   className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-full flex items-center gap-2"
                 >
                   <svg
