@@ -124,6 +124,40 @@ type ImageProps = ImgHTMLAttributes<HTMLImageElement> & {
   alt?: string;
 };
 
+// Add new components for HashtagLink and WikiLink
+interface HashtagLinkProps {
+  tag: string;
+  children?: ReactNode; // Allow children if MDX parser wraps the text
+}
+
+const HashtagLink = ({ tag, children }: HashtagLinkProps) => {
+  return (
+    <Link
+      href={`/tags/${tag}`}
+      className="text-amber-600 dark:text-amber-400 hover:underline font-medium"
+    >
+      {children || `#${tag}`}
+    </Link>
+  );
+};
+
+interface WikiLinkProps {
+  pageName: string;
+  href: string;
+  children?: ReactNode; // Allow children if MDX parser wraps the text
+}
+
+const WikiLink = ({ pageName, href, children }: WikiLinkProps) => {
+  return (
+    <Link
+      href={href}
+      className="px-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded hover:bg-amber-200 dark:hover:bg-amber-800/50"
+    >
+      {children || pageName}
+    </Link>
+  );
+};
+
 const MDXComponents = {
   h1: (props: HeadingProps) => (
     <h1
@@ -197,6 +231,9 @@ const MDXComponents = {
       <Card className="p-6 my-6" {...props} children={processedChildren} />
     );
   },
+  // Add the new components here
+  HashtagLink,
+  WikiLink,
 };
 
 export default MDXComponents;

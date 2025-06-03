@@ -26,12 +26,34 @@ export interface ProjectFrontmatter {
   };
 }
 
+// Define the journal frontmatter type
+export interface JournalFrontmatter {
+  title: string;
+  date: string; // ISO date string format
+  category: string;
+  excerpt: string;
+  mood: string;
+  growth: string;
+  tags: string[]; // For hashtags
+  wordCount: number; // For statistics
+  slug: string;
+}
+
 const projectsDirectory = path.join(process.cwd(), "content/projects");
+const journalsDirectory = path.join(process.cwd(), "content/journals");
 
 // Get all project slugs
 export function getProjectSlugs() {
   return fs
     .readdirSync(projectsDirectory)
+    .filter((file) => file.endsWith(".mdx"))
+    .map((file) => file.replace(/\.mdx$/, ""));
+}
+
+// Get all journal slugs
+export function getJournalSlugs() {
+  return fs
+    .readdirSync(journalsDirectory)
     .filter((file) => file.endsWith(".mdx"))
     .map((file) => file.replace(/\.mdx$/, ""));
 }
@@ -51,6 +73,20 @@ export function getAllProjects(): ProjectFrontmatter[] {
     // Fall back to status sorting if dates are missing
     const statusOrder = { Live: 0, Beta: 1, Planning: 2 };
     return statusOrder[a.status] - statusOrder[b.status];
+  });
+}
+
+// Get all journals with frontmatter
+export function getAllJournals(): JournalFrontmatter[] {
+  const slugs = getJournalSlugs();
+  const journals = slugs.map((slug) => getJournalBySlug(slug));
+
+  // Sort by date (most recent first)
+  return journals.sort((a, b) => {
+    if (a.date && b.date) {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    }
+    return 0;
   });
 }
 
@@ -87,6 +123,19 @@ export function getProjectBySlug(slug: string): ProjectFrontmatter {
   } as ProjectFrontmatter;
 }
 
+// Get a single journal by slug
+export function getJournalBySlug(slug: string): JournalFrontmatter {
+  const fullPath = path.join(journalsDirectory, `${slug}.mdx`);
+  const fileContents = fs.readFileSync(fullPath, "utf8");
+  const { data, content } = matter(fileContents);
+
+  return {
+    ...(data as JournalFrontmatter),
+    slug,
+    content,
+  } as JournalFrontmatter;
+}
+
 // Get a project with full content
 export function getProjectWithContent(slug: string) {
   const fullPath = path.join(projectsDirectory, `${slug}.mdx`);
@@ -97,5 +146,116 @@ export function getProjectWithContent(slug: string) {
     frontmatter: data as ProjectFrontmatter,
     slug,
     content,
+  };
+}
+
+// Get a journal with full content
+export function getJournalWithContent(slug: string) {
+  const fullPath = path.join(journalsDirectory, `${slug}.mdx`);
+  const fileContents = fs.readFileSync(fullPath, "utf8");
+  const { data, content } = matter(fileContents);
+
+  return {
+    frontmatter: data as JournalFrontmatter,
+    slug,
+    content,
+  };
+}
+
+// Calculate journal statistics
+export function getJournalStats() {
+  const journals = getAllJournals();
+
+  // Calculate unique days journaled (based on unique dates)
+  const uniqueDates = new Set(
+    journals.map((journal) => journal.date.split("T")[0])
+  );
+  const daysJournaled = uniqueDates.size;
+
+  // Total entries
+  const totalEntries = journals.length;
+
+  // Current streak calculation
+  const streak = calculateCurrentStreak(journals);
+
+  // Average words per entry
+  const totalWords = journals.reduce(
+    (sum, journal) => sum + (journal.wordCount || 0),
+    0
+  );
+  const averageWordsPerEntry =
+    totalEntries > 0 ? Math.round(totalWords / totalEntries) : 0;
+
+  return {
+    daysJournaled,
+    totalEntries,
+    currentStreak: streak,
+    averageWordsPerEntry,
+  };
+}
+
+// Helper function to calculate current streak
+function calculateCurrentStreak(journals: JournalFrontmatter[]): number {
+  if (journals.length === 0) return 0;
+
+  // Sort journals by date (newest first)
+  const sortedJournals = [...journals].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
+  // Get unique dates (YYYY-MM-DD format)
+  const uniqueDates = Array.from(
+    new Set(sortedJournals.map((j) => j.date.split("T")[0]))
+  ).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+
+  if (uniqueDates.length === 0) return 0;
+
+  // Check if most recent entry is from today or yesterday
+  const mostRecent = new Date(uniqueDates[0]);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const isRecentEnough =
+    mostRecent.getTime() === today.getTime() ||
+    mostRecent.getTime() === yesterday.getTime();
+
+  if (!isRecentEnough) return 0;
+
+  // Count consecutive days
+  let streak = 1;
+  for (let i = 1; i < uniqueDates.length; i++) {
+    const current = new Date(uniqueDates[i - 1]);
+    const prev = new Date(uniqueDates[i]);
+
+    // Check if dates are consecutive
+    const diffTime = current.getTime() - prev.getTime();
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+    if (Math.round(diffDays) === 1) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
+
+// Extract all hashtags and wiki links from journal content
+export function extractLinksAndTags(content: string) {
+  // Extract hashtags (e.g., #javascript, #react)
+  const hashtagRegex = /#([a-zA-Z0-9_-]+)/g;
+  const hashtags = Array.from(content.matchAll(hashtagRegex), (m) => m[1]);
+
+  // Extract wiki links (e.g., [[Node Name]])
+  const wikiLinkRegex = /\[\[([^\]]+)\]\]/g;
+  const wikiLinks = Array.from(content.matchAll(wikiLinkRegex), (m) => m[1]);
+
+  return {
+    hashtags: Array.from(new Set(hashtags)),
+    wikiLinks: Array.from(new Set(wikiLinks)),
   };
 }
