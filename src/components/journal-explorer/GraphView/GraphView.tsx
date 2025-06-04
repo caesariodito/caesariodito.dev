@@ -957,6 +957,7 @@ const GraphView: React.FC<GraphViewProps> = ({
           node={hoveredNode}
           position={hoverPosition}
           svgContainerRect={svgContainerRect}
+          zoomLevel={zoomLevel}
           onMouseEnter={() => {
             // Dispatch custom event when mouse enters preview
             document.dispatchEvent(new Event("preview-mouseenter"));

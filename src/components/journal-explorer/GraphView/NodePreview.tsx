@@ -24,7 +24,8 @@ interface SVGContainerRect {
 interface NodePreviewProps {
   node: GraphNode | null;
   position: HoverPosition;
-  svgContainerRect: SVGContainerRect; // Add the new prop
+  svgContainerRect: SVGContainerRect;
+  zoomLevel: number;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 }
@@ -33,6 +34,7 @@ const NodePreview: React.FC<NodePreviewProps> = ({
   node,
   position,
   svgContainerRect,
+  zoomLevel,
   onMouseEnter,
   onMouseLeave,
 }) => {
@@ -44,7 +46,6 @@ const NodePreview: React.FC<NodePreviewProps> = ({
   }); // Initialize off-screen
   const [isHovered, setIsHovered] = useState(false);
   const positionRef = useRef(position);
-  // Remove containerDimensions state as we now receive svgContainerRect as prop
 
   // Update position ref when position changes
   useEffect(() => {
@@ -64,10 +65,20 @@ const NodePreview: React.FC<NodePreviewProps> = ({
     const nodeScreenY = position.y;
     const nodeRadius = position.nodeRadius || 30; // Default radius if not provided
 
-    // Position the tooltip to the right of the node, vertically centered
-    const horizontalOffset = 15; // Space between node edge and tooltip
-    let targetViewportX = nodeScreenX + nodeRadius + horizontalOffset;
-    let targetViewportY = nodeScreenY - previewHeight / 2; // Vertically center relative to node center
+    // Define vertical offset constants
+    const baseVerticalOffset = 0; // Reduced to 0 to place tooltip directly on top of node
+    const verticalOffset = Math.max(
+      0,
+      baseVerticalOffset / Math.sqrt(zoomLevel)
+    ); // Min 0px padding
+
+    // Position the tooltip centered horizontally above the node
+    let targetViewportX = nodeScreenX - previewWidth / 2; // Center horizontally
+    let targetViewportY =
+      nodeScreenY -
+      nodeRadius / Math.sqrt(zoomLevel) -
+      previewHeight -
+      verticalOffset; // Position directly on top of node
 
     // Use svgContainerRect directly for boundaries
     const containerLeft = svgContainerRect.left;
@@ -75,23 +86,19 @@ const NodePreview: React.FC<NodePreviewProps> = ({
     const containerTop = svgContainerRect.top;
     const containerBottom = svgContainerRect.bottom;
 
-    // Adjust horizontally if needed to keep within container
+    // Adjust horizontally to keep within container, after centering
     if (targetViewportX + previewWidth > containerRight - 5) {
-      // If it would go outside the right edge, place it to the left of the node
-      targetViewportX =
-        nodeScreenX - nodeRadius - previewWidth - horizontalOffset;
-    }
-    // Ensure it doesn't go outside the left edge of the container
-    if (targetViewportX < containerLeft + 5) {
-      targetViewportX = containerLeft + 5;
+      targetViewportX = containerRight - previewWidth - 5; // Shift left to fit
+    } else if (targetViewportX < containerLeft + 5) {
+      targetViewportX = containerLeft + 5; // Shift right to fit
     }
 
     // Adjust vertically to keep within container
-    if (targetViewportY + previewHeight > containerBottom - 5) {
-      targetViewportY = containerBottom - previewHeight - 5;
-    }
     if (targetViewportY < containerTop + 5) {
       targetViewportY = containerTop + 5;
+    }
+    if (targetViewportY + previewHeight > containerBottom - 5) {
+      targetViewportY = containerBottom - previewHeight - 5;
     }
 
     // Convert final target viewport coordinates to be relative to the offset parent
@@ -100,7 +107,7 @@ const NodePreview: React.FC<NodePreviewProps> = ({
     let finalDivY = targetViewportY - containerTop;
 
     setAdjustedPosition({ x: finalDivX, y: finalDivY });
-  }, [position, svgContainerRect]); // Effect dependencies updated
+  }, [position, svgContainerRect, zoomLevel]); // Dependencies remain the same
 
   if (!node) return null;
 
