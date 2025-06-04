@@ -38,6 +38,13 @@ type D3Link = GraphLink & {
   target: D3Node;
 };
 
+// Define a type for the hover position, now including node radius
+interface HoverPosition {
+  x: number;
+  y: number;
+  nodeRadius?: number; // Optional: useful for offsetting from node edge
+}
+
 // Add a type for the API response
 interface GraphNodeResponse {
   id: string;
@@ -81,13 +88,19 @@ const GraphView: React.FC<GraphViewProps> = ({
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
+  const [hoverPosition, setHoverPosition] = useState<HoverPosition>({
+    x: 0,
+    y: 0,
+    nodeRadius: 0,
+  });
   // Add a ref to track the current hovered node to prevent flickering
   const hoveredNodeRef = useRef<string | null>(null);
   // Add a timeout ref to manage debounced hover state
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Add a flag to track if mouse is over the preview
   const isMouseOverPreviewRef = useRef<boolean>(false);
+  // Add refs to track current mouse position
+  const mousePositionRef = useRef({ x: 0, y: 0 });
   const { theme } = useTheme();
   const [simulationInitialized, setSimulationInitialized] = useState(false);
   const [containerDimensions, setContainerDimensions] = useState({
@@ -97,13 +110,26 @@ const GraphView: React.FC<GraphViewProps> = ({
   // Add a state to track when the SVG is mounted
   const [svgMounted, setSvgMounted] = useState(false);
 
+  // Add a mouse move handler to track mouse position
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mousePositionRef.current = { x: e.clientX, y: e.clientY };
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
   // Debounced version of setHoveredNode to prevent flickering
-  // Increased debounce time from 50ms to 100ms for better stability
+  // Reduced debounce time for more immediate appearance
   const debouncedSetHoveredNode = useCallback(
-    debounce((node: GraphNode | null, position?: { x: number; y: number }) => {
+    debounce((node: GraphNode | null, position?: HoverPosition) => {
       setHoveredNode(node);
       if (position) setHoverPosition(position);
-    }, 100),
+    }, 10), // Reduced from 100ms to 10ms for more immediate response
     []
   );
 
@@ -119,7 +145,7 @@ const GraphView: React.FC<GraphViewProps> = ({
 
   // Function to safely set hover state with node proximity check
   const safeSetHoveredNode = useCallback(
-    (node: GraphNode | null, position?: { x: number; y: number }) => {
+    (node: GraphNode | null, position?: HoverPosition) => {
       // If we're already hovering this node, don't do anything
       if (node && hoveredNodeRef.current === node.id) return;
 
@@ -129,7 +155,7 @@ const GraphView: React.FC<GraphViewProps> = ({
         hoverTimeoutRef.current = null;
       }
 
-      // Update hover state
+      // Set the currently hovered node ID in the ref
       hoveredNodeRef.current = node ? node.id : null;
       debouncedSetHoveredNode(node, position);
     },
@@ -158,6 +184,11 @@ const GraphView: React.FC<GraphViewProps> = ({
         },
         { passive: false }
       );
+
+      // Track mouse position within the SVG
+      node.addEventListener("mousemove", (event) => {
+        mousePositionRef.current = { x: event.clientX, y: event.clientY };
+      });
     }
   }, []);
 
@@ -300,6 +331,8 @@ const GraphView: React.FC<GraphViewProps> = ({
         .enter()
         .append("g")
         .attr("class", "node-group")
+        // Set cursor style for the entire node group
+        .style("cursor", "pointer")
         .call(
           d3
             .drag<SVGGElement, D3Node>()
@@ -330,19 +363,51 @@ const GraphView: React.FC<GraphViewProps> = ({
           // Set the currently hovered node ID in the ref
           hoveredNodeRef.current = d.id;
 
-          // Calculate position for the tooltip
-          const [x, y] = d3.pointer(event);
-          const transform = d3.zoomTransform(svg.node() as SVGSVGElement);
+          const calculatedPosition: HoverPosition = {
+            x: 0,
+            y: 0,
+            nodeRadius: d.radius || 30,
+          };
 
-          // Adjust position based on zoom level to prevent overlap
-          const adjustedY = y + transform.y;
-          const adjustedX = x + transform.x;
+          if (svgRef.current && d.x !== undefined && d.y !== undefined) {
+            const svgElement = svgRef.current;
+            const svgRect = svgElement.getBoundingClientRect();
+            const currentTransform = d3.zoomTransform(svgElement);
 
-          // Use the debounced setter to prevent flickering
-          debouncedSetHoveredNode(d, {
-            x: adjustedX,
-            y: adjustedY,
-          });
+            // Apply D3 transform to node's graph coordinates
+            const transformedX = currentTransform.applyX(d.x);
+            const transformedY = currentTransform.applyY(d.y);
+
+            // Calculate node's center position relative to the viewport
+            calculatedPosition.x = svgRect.left + transformedX;
+            calculatedPosition.y = svgRect.top + transformedY;
+          } else {
+            // Fallback to mouse cursor position if node coordinates are not available (should be rare)
+            // Get the actual mouse position in client coordinates
+            let clientX = 0;
+            let clientY = 0;
+
+            if (event.sourceEvent) {
+              clientX = event.sourceEvent.clientX;
+              clientY = event.sourceEvent.clientY;
+            } else if ("clientX" in event && "clientY" in event) {
+              clientX = (event as MouseEvent).clientX;
+              clientY = (event as MouseEvent).clientY;
+            } else {
+              const evt = window.event as MouseEvent | undefined;
+              clientX = evt?.clientX || 0;
+              clientY = evt?.clientY || 0;
+            }
+            if (clientX === 0 && clientY === 0) {
+              clientX = mousePositionRef.current.x;
+              clientY = mousePositionRef.current.y;
+            }
+            calculatedPosition.x = clientX;
+            calculatedPosition.y = clientY;
+          }
+
+          // Use the debounced setter to update hover state with new position
+          debouncedSetHoveredNode(d, calculatedPosition);
 
           // Add hover class to the node for visual feedback
           d3.select(event.currentTarget).classed("node-hovered", true);
@@ -383,7 +448,9 @@ const GraphView: React.FC<GraphViewProps> = ({
             return theme === "dark" ? "#a8a29e" : "#78716c";
           return theme === "dark" ? "#57534e" : "#d6d3d1";
         })
-        .attr("stroke-width", 2);
+        .attr("stroke-width", 2)
+        // Ensure circle has pointer events
+        .style("pointer-events", "all");
 
       // Add invisible larger hit area for better hover detection
       node
@@ -405,7 +472,11 @@ const GraphView: React.FC<GraphViewProps> = ({
         .attr("text-anchor", "middle")
         .attr("dy", (d) => (d.type === "journal" ? 4 : 4))
         .attr("font-size", (d) => (d.type === "journal" ? "12px" : "10px"))
-        .attr("fill", theme === "dark" ? "#e7e5e4" : "#44403c");
+        .attr("fill", theme === "dark" ? "#e7e5e4" : "#44403c")
+        // Disable text selection and pointer events on text
+        .style("pointer-events", "none")
+        .style("user-select", "none")
+        .style("cursor", "pointer");
 
       // Add mood emoji for journal nodes
       node
@@ -414,7 +485,11 @@ const GraphView: React.FC<GraphViewProps> = ({
         .text((d) => d.mood || "")
         .attr("text-anchor", "middle")
         .attr("dy", -15)
-        .attr("font-size", "16px");
+        .attr("font-size", "16px")
+        // Disable text selection and pointer events on mood emoji
+        .style("pointer-events", "none")
+        .style("user-select", "none")
+        .style("cursor", "pointer");
 
       // Update positions on simulation tick
       simulation.on("tick", () => {
@@ -452,6 +527,18 @@ const GraphView: React.FC<GraphViewProps> = ({
         .node-hovered circle:first-child {
           stroke-width: 3px;
           stroke-opacity: 1;
+        }
+        /* Prevent text selection in the graph */
+        .node-group text {
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          pointer-events: none;
+        }
+        /* Ensure consistent cursor on nodes */
+        .node-group {
+          cursor: pointer;
         }
       `;
       document.head.appendChild(style);

@@ -4,9 +4,16 @@ import { Card } from "@/components/ui/card";
 import { Calendar, Hash } from "lucide-react";
 import type { GraphNode } from "@/components/journal-explorer/GraphView/types";
 
+// Updated position prop type to match GraphView.tsx
+interface HoverPosition {
+  x: number;
+  y: number;
+  nodeRadius?: number;
+}
+
 interface NodePreviewProps {
   node: GraphNode | null;
-  position: { x: number; y: number };
+  position: HoverPosition; // Use the updated HoverPosition type
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 }
@@ -18,68 +25,138 @@ const NodePreview: React.FC<NodePreviewProps> = ({
   onMouseLeave,
 }) => {
   const previewRef = useRef<HTMLDivElement>(null);
-  const [adjustedPosition, setAdjustedPosition] = useState(position);
+  // adjustedPosition will store the final CSS top/left values
+  const [adjustedPosition, setAdjustedPosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const positionRef = useRef(position);
+  // Store container dimensions to handle positioning
+  const [containerDimensions, setContainerDimensions] = useState({
+    width: 0,
+    height: 0,
+    left: 0,
+    top: 0,
+  });
 
   // Update position ref when position changes
   useEffect(() => {
     positionRef.current = position;
   }, [position]);
 
-  // Adjust position to avoid going out of viewport and prevent overlap with node
+  // Get the SVG container dimensions
+  useEffect(() => {
+    // Find the SVG container element - use a more reliable selector
+    // Look for the SVG element inside the graph container
+    const svgElement = document.querySelector("svg");
+    if (svgElement) {
+      // Get the parent container of the SVG
+      const svgContainer = svgElement.closest("div");
+      if (svgContainer) {
+        const rect = svgContainer.getBoundingClientRect();
+        setContainerDimensions({
+          width: rect.width,
+          height: rect.height,
+          left: rect.left,
+          top: rect.top,
+        });
+      }
+    }
+  }, []);
+
+  // Adjust position to keep tooltip within the visible canvas area
   useEffect(() => {
     if (!previewRef.current) return;
 
     const previewRect = previewRef.current.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+    const previewWidth = previewRect.width;
+    const previewHeight = previewRect.height;
 
-    // Calculate adjusted position
-    let adjustedX = position.x;
-    let adjustedY = position.y + 20; // Default offset below the node
+    // Get current node's center screen coordinates and radius
+    const nodeScreenX = position.x;
+    const nodeScreenY = position.y;
+    const nodeRadius = position.nodeRadius || 30; // Default radius if not provided
 
-    // Add a minimum distance from the node to prevent immediate mouseout
-    const minDistance = 15;
+    // Position the tooltip to the right of the node, vertically centered
+    const horizontalOffset = 15; // Space between node edge and tooltip
+    let targetViewportX = nodeScreenX + nodeRadius + horizontalOffset;
+    let targetViewportY = nodeScreenY - previewHeight / 2; // Vertically center relative to node center
 
-    // Adjust horizontally if needed
-    if (position.x + previewRect.width > viewportWidth - 20) {
-      adjustedX = position.x - previewRect.width - minDistance;
+    // Check if the SVG container dimensions are available
+    if (containerDimensions.width > 0) {
+      // Get the boundaries of the SVG container (in viewport coordinates)
+      const containerLeft = containerDimensions.left;
+      const containerRight = containerLeft + containerDimensions.width;
+      const containerTop = containerDimensions.top;
+      const containerBottom = containerTop + containerDimensions.height;
+
+      // Adjust horizontally if needed to keep within container
+      if (targetViewportX + previewWidth > containerRight - 5) {
+        // If it would go outside the right edge, place it to the left of the node
+        targetViewportX =
+          nodeScreenX - nodeRadius - previewWidth - horizontalOffset;
+      }
+      // Ensure it doesn't go outside the left edge of the container
+      if (targetViewportX < containerLeft + 5) {
+        targetViewportX = containerLeft + 5;
+      }
+
+      // Adjust vertically to keep within container
+      if (targetViewportY + previewHeight > containerBottom - 5) {
+        targetViewportY = containerBottom - previewHeight - 5;
+      }
+      if (targetViewportY < containerTop + 5) {
+        targetViewportY = containerTop + 5;
+      }
     } else {
-      adjustedX = position.x + minDistance;
+      // Fallback if container dimensions aren't available: use viewport dimensions
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // Adjust horizontally if needed within viewport
+      if (targetViewportX + previewWidth > viewportWidth - 5) {
+        targetViewportX =
+          nodeScreenX - nodeRadius - previewWidth - horizontalOffset;
+      }
+      if (targetViewportX < 5) {
+        // Prevent going off left edge of viewport
+        targetViewportX = 5;
+      }
+
+      // Adjust vertically to keep within viewport
+      if (targetViewportY + previewHeight > viewportHeight - 5) {
+        targetViewportY = viewportHeight - previewHeight - 5;
+      }
+      if (targetViewportY < 5) {
+        // Prevent going off top edge of viewport
+        targetViewportY = 5;
+      }
     }
 
-    // Adjust vertically if needed
-    if (position.y + previewRect.height > viewportHeight - 20) {
-      adjustedY = position.y - previewRect.height - minDistance; // Place above the node
-    } else {
-      adjustedY = position.y + minDistance; // Place below the node with minimum distance
-    }
+    // Convert final target viewport coordinates to be relative to the offset parent.
+    // This is necessary because the Card is position: absolute.
+    let finalDivX = targetViewportX;
+    let finalDivY = targetViewportY;
 
-    // Ensure the tooltip doesn't jump around too much
-    const prevPosition = adjustedPosition;
-    const distance = Math.sqrt(
-      Math.pow(prevPosition.x - adjustedX, 2) +
-        Math.pow(prevPosition.y - adjustedY, 2)
-    );
-
-    // Only update position if it's significantly different (prevents small jitters)
-    if (distance > 5) {
-      setAdjustedPosition({ x: adjustedX, y: adjustedY });
+    if (containerDimensions.width > 0) {
+      // Ensure container dimensions are loaded
+      finalDivX -= containerDimensions.left;
+      finalDivY -= containerDimensions.top;
     }
-  }, [position, adjustedPosition]);
+    // If containerDimensions are not yet ready, finalDivX/Y will be raw viewport coordinates.
+    // This might cause a brief mispositioning until containerDimensions are available and this effect re-runs.
+
+    setAdjustedPosition({ x: finalDivX, y: finalDivY });
+  }, [position, containerDimensions]); // Effect dependencies
 
   if (!node) return null;
 
-  // Style with adjusted position and transition for smoother movement
+  // Style with adjusted position
   const style = {
     left: `${adjustedPosition.x}px`,
     top: `${adjustedPosition.y}px`,
-    // Allow pointer events so we can hover the preview
-    pointerEvents: "auto" as const,
+    pointerEvents: "auto" as const, // Allow pointer events so we can hover the preview
     zIndex: 1000,
-    // Add transition for smoother movement
-    transition: "left 0.1s ease-out, top 0.1s ease-out",
+    // transition: "left 0.1s ease-out, top 0.1s ease-out", // Removed for immediate placement
+    maxWidth: "300px", // Add a max-width to prevent very wide tooltips
   };
 
   // Handle mouse events with improved event handling
