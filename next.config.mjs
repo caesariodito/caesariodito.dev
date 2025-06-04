@@ -1,12 +1,16 @@
-/** @type {import('next').NextConfig} */
-const withMDX = require("@next/mdx")({
+import createMDX from '@next/mdx';
+import remarkGfm from 'remark-gfm';
+import rehypeSlug from 'rehype-slug';
+
+const withMDX = createMDX({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [require("remark-gfm")],
-    rehypePlugins: [require("rehype-slug")],
+    remarkPlugins: [remarkGfm],
+    rehypePlugins: [rehypeSlug],
   },
 });
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -28,4 +32,4 @@ const nextConfig = {
 };
 
 // Merge MDX config with Next.js config
-module.exports = withMDX(nextConfig);
+export default withMDX(nextConfig); 
