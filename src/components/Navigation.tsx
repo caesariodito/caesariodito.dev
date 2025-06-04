@@ -10,10 +10,12 @@ import { Menu, X, ChevronDown } from "lucide-react";
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
+  const [journalDropdownOpen, setJournalDropdownOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const journalDropdownRef = useRef<HTMLDivElement>(null);
 
   // After mounting, we have access to the theme
   useEffect(() => {
@@ -29,6 +31,13 @@ const Navigation = () => {
       ) {
         setProjectsDropdownOpen(false);
       }
+
+      if (
+        journalDropdownRef.current &&
+        !journalDropdownRef.current.contains(event.target as Node)
+      ) {
+        setJournalDropdownOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -40,6 +49,7 @@ const Navigation = () => {
   // Close dropdown when changing routes
   useEffect(() => {
     setProjectsDropdownOpen(false);
+    setJournalDropdownOpen(false);
   }, [pathname]);
 
   const navItems = [
@@ -56,7 +66,15 @@ const Navigation = () => {
     },
     { name: "Philosophy", path: "/philosophy" },
     { name: "Tools", path: "/tools" },
-    { name: "Journal", path: "/journal" },
+    {
+      name: "Journal",
+      path: "/journal",
+      hasDropdown: true,
+      dropdownItems: [
+        { name: "Latest Entries", path: "/journal" },
+        { name: "Journal Explorer", path: "/journal-explorer" },
+      ],
+    },
   ];
 
   const toggleTheme = () => {
@@ -67,6 +85,11 @@ const Navigation = () => {
     pathname === "/projects" ||
     pathname === "/project-gallery" ||
     pathname.startsWith("/projects/");
+
+  const isJournalActive =
+    pathname === "/journal" ||
+    pathname === "/journal-explorer" ||
+    pathname.startsWith("/journal/");
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-white/90 dark:bg-stone-900/90 backdrop-blur-md border-b border-stone-200 dark:border-stone-700">
@@ -83,13 +106,28 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-8">
             {navItems.slice(1).map((item) =>
               item.hasDropdown ? (
-                <div key={item.name} className="relative" ref={dropdownRef}>
+                <div
+                  key={item.name}
+                  className="relative"
+                  ref={
+                    item.name === "Projects"
+                      ? dropdownRef
+                      : item.name === "Journal"
+                      ? journalDropdownRef
+                      : undefined
+                  }
+                >
                   <button
-                    onClick={() =>
-                      setProjectsDropdownOpen(!projectsDropdownOpen)
-                    }
+                    onClick={() => {
+                      if (item.name === "Projects") {
+                        setProjectsDropdownOpen(!projectsDropdownOpen);
+                      } else if (item.name === "Journal") {
+                        setJournalDropdownOpen(!journalDropdownOpen);
+                      }
+                    }}
                     className={`text-sm font-medium transition-colors hover:text-amber-600 dark:hover:text-amber-400 flex items-center ${
-                      isProjectsActive
+                      (item.name === "Projects" && isProjectsActive) ||
+                      (item.name === "Journal" && isJournalActive)
                         ? "text-amber-600 dark:text-amber-400"
                         : "text-stone-600 dark:text-stone-300"
                     }`}
@@ -98,11 +136,15 @@ const Navigation = () => {
                     <ChevronDown
                       size={16}
                       className={`ml-1 transition-transform ${
-                        projectsDropdownOpen ? "rotate-180" : ""
+                        (item.name === "Projects" && projectsDropdownOpen) ||
+                        (item.name === "Journal" && journalDropdownOpen)
+                          ? "rotate-180"
+                          : ""
                       }`}
                     />
                   </button>
-                  {projectsDropdownOpen && (
+                  {((item.name === "Projects" && projectsDropdownOpen) ||
+                    (item.name === "Journal" && journalDropdownOpen)) && (
                     <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-stone-800 rounded-md shadow-lg py-1 z-50 border border-stone-200 dark:border-stone-700">
                       {item.dropdownItems?.map((dropdownItem) => (
                         <Link
@@ -173,11 +215,16 @@ const Navigation = () => {
                 item.hasDropdown ? (
                   <div key={item.name} className="space-y-2">
                     <button
-                      onClick={() =>
-                        setProjectsDropdownOpen(!projectsDropdownOpen)
-                      }
+                      onClick={() => {
+                        if (item.name === "Projects") {
+                          setProjectsDropdownOpen(!projectsDropdownOpen);
+                        } else if (item.name === "Journal") {
+                          setJournalDropdownOpen(!journalDropdownOpen);
+                        }
+                      }}
                       className={`text-sm font-medium transition-colors hover:text-amber-600 dark:hover:text-amber-400 flex items-center ${
-                        isProjectsActive
+                        (item.name === "Projects" && isProjectsActive) ||
+                        (item.name === "Journal" && isJournalActive)
                           ? "text-amber-600 dark:text-amber-400"
                           : "text-stone-600 dark:text-stone-300"
                       }`}
@@ -186,11 +233,15 @@ const Navigation = () => {
                       <ChevronDown
                         size={16}
                         className={`ml-1 transition-transform ${
-                          projectsDropdownOpen ? "rotate-180" : ""
+                          (item.name === "Projects" && projectsDropdownOpen) ||
+                          (item.name === "Journal" && journalDropdownOpen)
+                            ? "rotate-180"
+                            : ""
                         }`}
                       />
                     </button>
-                    {projectsDropdownOpen && (
+                    {((item.name === "Projects" && projectsDropdownOpen) ||
+                      (item.name === "Journal" && journalDropdownOpen)) && (
                       <div className="pl-4 space-y-2 mt-1">
                         {item.dropdownItems?.map((dropdownItem) => (
                           <Link
