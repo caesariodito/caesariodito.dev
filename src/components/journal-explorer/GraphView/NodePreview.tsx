@@ -11,9 +11,20 @@ interface HoverPosition {
   nodeRadius?: number;
 }
 
+// Add SVG container rect interface
+interface SVGContainerRect {
+  width: number;
+  height: number;
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 interface NodePreviewProps {
   node: GraphNode | null;
-  position: HoverPosition; // Use the updated HoverPosition type
+  position: HoverPosition;
+  svgContainerRect: SVGContainerRect; // Add the new prop
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 }
@@ -21,50 +32,28 @@ interface NodePreviewProps {
 const NodePreview: React.FC<NodePreviewProps> = ({
   node,
   position,
+  svgContainerRect,
   onMouseEnter,
   onMouseLeave,
 }) => {
   const previewRef = useRef<HTMLDivElement>(null);
   // adjustedPosition will store the final CSS top/left values
-  const [adjustedPosition, setAdjustedPosition] = useState({ x: 0, y: 0 });
+  const [adjustedPosition, setAdjustedPosition] = useState({
+    x: -9999,
+    y: -9999,
+  }); // Initialize off-screen
   const [isHovered, setIsHovered] = useState(false);
   const positionRef = useRef(position);
-  // Store container dimensions to handle positioning
-  const [containerDimensions, setContainerDimensions] = useState({
-    width: 0,
-    height: 0,
-    left: 0,
-    top: 0,
-  });
+  // Remove containerDimensions state as we now receive svgContainerRect as prop
 
   // Update position ref when position changes
   useEffect(() => {
     positionRef.current = position;
   }, [position]);
 
-  // Get the SVG container dimensions
-  useEffect(() => {
-    // Find the SVG container element - use a more reliable selector
-    // Look for the SVG element inside the graph container
-    const svgElement = document.querySelector("svg");
-    if (svgElement) {
-      // Get the parent container of the SVG
-      const svgContainer = svgElement.closest("div");
-      if (svgContainer) {
-        const rect = svgContainer.getBoundingClientRect();
-        setContainerDimensions({
-          width: rect.width,
-          height: rect.height,
-          left: rect.left,
-          top: rect.top,
-        });
-      }
-    }
-  }, []);
-
   // Adjust position to keep tooltip within the visible canvas area
   useEffect(() => {
-    if (!previewRef.current) return;
+    if (!previewRef.current || !svgContainerRect) return;
 
     const previewRect = previewRef.current.getBoundingClientRect();
     const previewWidth = previewRect.width;
@@ -80,83 +69,50 @@ const NodePreview: React.FC<NodePreviewProps> = ({
     let targetViewportX = nodeScreenX + nodeRadius + horizontalOffset;
     let targetViewportY = nodeScreenY - previewHeight / 2; // Vertically center relative to node center
 
-    // Check if the SVG container dimensions are available
-    if (containerDimensions.width > 0) {
-      // Get the boundaries of the SVG container (in viewport coordinates)
-      const containerLeft = containerDimensions.left;
-      const containerRight = containerLeft + containerDimensions.width;
-      const containerTop = containerDimensions.top;
-      const containerBottom = containerTop + containerDimensions.height;
+    // Use svgContainerRect directly for boundaries
+    const containerLeft = svgContainerRect.left;
+    const containerRight = svgContainerRect.right;
+    const containerTop = svgContainerRect.top;
+    const containerBottom = svgContainerRect.bottom;
 
-      // Adjust horizontally if needed to keep within container
-      if (targetViewportX + previewWidth > containerRight - 5) {
-        // If it would go outside the right edge, place it to the left of the node
-        targetViewportX =
-          nodeScreenX - nodeRadius - previewWidth - horizontalOffset;
-      }
-      // Ensure it doesn't go outside the left edge of the container
-      if (targetViewportX < containerLeft + 5) {
-        targetViewportX = containerLeft + 5;
-      }
-
-      // Adjust vertically to keep within container
-      if (targetViewportY + previewHeight > containerBottom - 5) {
-        targetViewportY = containerBottom - previewHeight - 5;
-      }
-      if (targetViewportY < containerTop + 5) {
-        targetViewportY = containerTop + 5;
-      }
-    } else {
-      // Fallback if container dimensions aren't available: use viewport dimensions
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-
-      // Adjust horizontally if needed within viewport
-      if (targetViewportX + previewWidth > viewportWidth - 5) {
-        targetViewportX =
-          nodeScreenX - nodeRadius - previewWidth - horizontalOffset;
-      }
-      if (targetViewportX < 5) {
-        // Prevent going off left edge of viewport
-        targetViewportX = 5;
-      }
-
-      // Adjust vertically to keep within viewport
-      if (targetViewportY + previewHeight > viewportHeight - 5) {
-        targetViewportY = viewportHeight - previewHeight - 5;
-      }
-      if (targetViewportY < 5) {
-        // Prevent going off top edge of viewport
-        targetViewportY = 5;
-      }
+    // Adjust horizontally if needed to keep within container
+    if (targetViewportX + previewWidth > containerRight - 5) {
+      // If it would go outside the right edge, place it to the left of the node
+      targetViewportX =
+        nodeScreenX - nodeRadius - previewWidth - horizontalOffset;
+    }
+    // Ensure it doesn't go outside the left edge of the container
+    if (targetViewportX < containerLeft + 5) {
+      targetViewportX = containerLeft + 5;
     }
 
-    // Convert final target viewport coordinates to be relative to the offset parent.
-    // This is necessary because the Card is position: absolute.
-    let finalDivX = targetViewportX;
-    let finalDivY = targetViewportY;
-
-    if (containerDimensions.width > 0) {
-      // Ensure container dimensions are loaded
-      finalDivX -= containerDimensions.left;
-      finalDivY -= containerDimensions.top;
+    // Adjust vertically to keep within container
+    if (targetViewportY + previewHeight > containerBottom - 5) {
+      targetViewportY = containerBottom - previewHeight - 5;
     }
-    // If containerDimensions are not yet ready, finalDivX/Y will be raw viewport coordinates.
-    // This might cause a brief mispositioning until containerDimensions are available and this effect re-runs.
+    if (targetViewportY < containerTop + 5) {
+      targetViewportY = containerTop + 5;
+    }
+
+    // Convert final target viewport coordinates to be relative to the offset parent
+    // This is necessary because the Card is position: absolute
+    let finalDivX = targetViewportX - containerLeft;
+    let finalDivY = targetViewportY - containerTop;
 
     setAdjustedPosition({ x: finalDivX, y: finalDivY });
-  }, [position, containerDimensions]); // Effect dependencies
+  }, [position, svgContainerRect]); // Effect dependencies updated
 
   if (!node) return null;
 
-  // Style with adjusted position
+  // Style with adjusted position and add opacity transition
   const style = {
     left: `${adjustedPosition.x}px`,
     top: `${adjustedPosition.y}px`,
-    pointerEvents: "auto" as const, // Allow pointer events so we can hover the preview
+    pointerEvents: "auto" as const,
     zIndex: 1000,
-    // transition: "left 0.1s ease-out, top 0.1s ease-out", // Removed for immediate placement
-    maxWidth: "300px", // Add a max-width to prevent very wide tooltips
+    maxWidth: "300px",
+    opacity: adjustedPosition.x === -9999 ? 0 : 1, // Hide until properly positioned
+    transition: "opacity 0.1s ease-out", // Smooth fade-in once positioned
   };
 
   // Handle mouse events with improved event handling

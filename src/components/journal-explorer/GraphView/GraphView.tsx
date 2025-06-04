@@ -45,6 +45,16 @@ interface HoverPosition {
   nodeRadius?: number; // Optional: useful for offsetting from node edge
 }
 
+// Add SVG container rect type
+interface SVGContainerRect {
+  width: number;
+  height: number;
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 // Add a type for the API response
 interface GraphNodeResponse {
   id: string;
@@ -93,6 +103,9 @@ const GraphView: React.FC<GraphViewProps> = ({
     y: 0,
     nodeRadius: 0,
   });
+  // Add SVG container rect state
+  const [svgContainerRect, setSvgContainerRect] =
+    useState<SVGContainerRect | null>(null);
   // Add a ref to track the current hovered node to prevent flickering
   const hoveredNodeRef = useRef<string | null>(null);
   // Add a timeout ref to manage debounced hover state
@@ -173,6 +186,17 @@ const GraphView: React.FC<GraphViewProps> = ({
       const height = node.clientHeight || 600;
       console.log("SVG mounted with dimensions:", width, height);
       setContainerDimensions({ width, height });
+
+      // Get and store the SVG container's bounding rect
+      const rect = node.getBoundingClientRect();
+      setSvgContainerRect({
+        width: rect.width,
+        height: rect.height,
+        left: rect.left,
+        top: rect.top,
+        right: rect.right,
+        bottom: rect.bottom,
+      });
 
       // Prevent browser zoom on wheel events
       node.addEventListener(
@@ -770,7 +794,7 @@ const GraphView: React.FC<GraphViewProps> = ({
     }
   }, [journalEntries]);
 
-  // Add a useEffect to update dimensions on window resize
+  // Add a useEffect to update dimensions and SVG container rect on window resize
   useEffect(() => {
     const updateDimensions = () => {
       if (svgRef.current) {
@@ -778,6 +802,17 @@ const GraphView: React.FC<GraphViewProps> = ({
         const height = svgRef.current.clientHeight || 600;
         console.log("Updated SVG dimensions:", width, height);
         setContainerDimensions({ width, height });
+
+        // Update SVG container rect on resize
+        const rect = svgRef.current.getBoundingClientRect();
+        setSvgContainerRect({
+          width: rect.width,
+          height: rect.height,
+          left: rect.left,
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+        });
       }
     };
 
@@ -916,11 +951,12 @@ const GraphView: React.FC<GraphViewProps> = ({
         height={containerDimensions.height}
       />
 
-      {/* Node preview on hover */}
-      {hoveredNode && (
+      {/* Node preview on hover - only render when we have both hoveredNode and svgContainerRect */}
+      {hoveredNode && svgContainerRect && (
         <NodePreview
           node={hoveredNode}
           position={hoverPosition}
+          svgContainerRect={svgContainerRect}
           onMouseEnter={() => {
             // Dispatch custom event when mouse enters preview
             document.dispatchEvent(new Event("preview-mouseenter"));
