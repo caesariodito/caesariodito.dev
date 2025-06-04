@@ -28,6 +28,9 @@ const nextConfig = {
   // Optimize for Vercel deployment
   poweredByHeader: false,
 
+  // Ensure API routes are properly handled
+  output: "standalone",
+
   // Configure source directories for Next.js
   transpilePackages: [],
 
