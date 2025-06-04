@@ -1,6 +1,8 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { FadeIn, StaggerContainer } from "@/components/ui/motion";
 
 const Tools = () => {
   const toolCategories = [
@@ -113,144 +115,286 @@ const Tools = () => {
     <main className="pt-20 pb-16">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
-        <section className="py-16 text-center">
-          <h1 className="text-4xl lg:text-5xl font-light text-stone-800 dark:text-stone-100 mb-6">
+        <motion.section
+          className="py-16 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          <motion.h1
+            className="text-4xl lg:text-5xl font-light text-stone-800 dark:text-stone-100 mb-6"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
             Thoughtful Tools
-          </h1>
-          <p className="text-xl text-stone-600 dark:text-stone-300 leading-relaxed max-w-3xl mx-auto">
+          </motion.h1>
+          <motion.p
+            className="text-xl text-stone-600 dark:text-stone-300 leading-relaxed max-w-3xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+          >
             Every tool in my stack serves a purpose beyond functionality—each
             teaches me something about craft, reflection, or intentional growth.
-          </p>
-        </section>
+          </motion.p>
+        </motion.section>
 
         {/* Tool Categories */}
         <section className="space-y-16">
           {toolCategories.map((category, categoryIndex) => (
-            <div key={categoryIndex} className="space-y-8">
+            <motion.div
+              key={categoryIndex}
+              className="space-y-8"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7, delay: categoryIndex * 0.1 }}
+            >
               <div className="text-center">
-                <h2 className="text-3xl font-light text-stone-800 dark:text-stone-100 mb-4">
+                <motion.h2
+                  className="text-3xl font-light text-stone-800 dark:text-stone-100 mb-4"
+                  initial={{ opacity: 0, y: -10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.5,
+                    delay: 0.2 + categoryIndex * 0.1,
+                  }}
+                >
                   {category.category}
-                </h2>
-                <p className="text-stone-600 dark:text-stone-300 text-lg">
+                </motion.h2>
+                <motion.p
+                  className="text-stone-600 dark:text-stone-300 text-lg"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.5,
+                    delay: 0.3 + categoryIndex * 0.1,
+                  }}
+                >
                   {category.description}
-                </p>
+                </motion.p>
               </div>
 
-              <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              <StaggerContainer
+                className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6"
+                staggerDelay={0.1}
+              >
                 {category.tools.map((tool, toolIndex) => (
-                  <Card
+                  <FadeIn
                     key={toolIndex}
-                    className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 hover:shadow-lg transition-all duration-300"
+                    delay={0.1 * toolIndex}
+                    direction="up"
                   >
-                    <div className="space-y-4">
-                      <div>
-                        <h3 className="text-xl font-medium text-stone-800 dark:text-stone-200 mb-2">
-                          {tool.name}
-                        </h3>
-                        <p className="text-amber-600 dark:text-amber-400 text-sm font-medium mb-3">
-                          {tool.purpose}
-                        </p>
-                      </div>
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -5 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Card className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 hover:shadow-lg transition-all duration-300 h-full">
+                        <div className="space-y-4">
+                          <div>
+                            <h3 className="text-xl font-medium text-stone-800 dark:text-stone-200 mb-2">
+                              {tool.name}
+                            </h3>
+                            <p className="text-amber-600 dark:text-amber-400 text-sm font-medium mb-3">
+                              {tool.purpose}
+                            </p>
+                          </div>
 
-                      <div className="space-y-3">
-                        <div>
-                          <h4 className="text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
-                            Personal Reflection
-                          </h4>
-                          <p className="text-stone-600 dark:text-stone-400 text-sm">
-                            {tool.reflection}
-                          </p>
-                        </div>
+                          <div className="space-y-3">
+                            <div>
+                              <h4 className="text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
+                                Personal Reflection
+                              </h4>
+                              <p className="text-stone-600 dark:text-stone-400 text-sm">
+                                {tool.reflection}
+                              </p>
+                            </div>
 
-                        <div>
-                          <h4 className="text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
-                            Philosophy
-                          </h4>
-                          <p className="text-stone-600 dark:text-stone-400 text-sm italic">
-                            {tool.philosophy}
-                          </p>
+                            <div>
+                              <h4 className="text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
+                                Philosophy
+                              </h4>
+                              <p className="text-stone-600 dark:text-stone-400 text-sm italic">
+                                {tool.philosophy}
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </Card>
+                      </Card>
+                    </motion.div>
+                  </FadeIn>
                 ))}
-              </div>
-            </div>
+              </StaggerContainer>
+            </motion.div>
           ))}
         </section>
 
         {/* Tool Philosophy */}
-        <section className="py-16">
-          <Card className="p-8 bg-gradient-to-br from-amber-50 to-stone-50 dark:from-amber-900/10 dark:to-stone-800 border-amber-200 dark:border-stone-700">
-            <div className="text-center space-y-6">
-              <h2 className="text-2xl font-medium text-stone-800 dark:text-stone-200">
-                On Choosing Tools
-              </h2>
-              <div className="max-w-3xl mx-auto space-y-4 text-stone-600 dark:text-stone-300 leading-relaxed">
-                <p>
-                  I don't chase the latest frameworks or tools just because
-                  they're new. Instead, I choose technologies that align with my
-                  values: simplicity over complexity, sustainability over speed,
-                  and tools that make me think better rather than just work
-                  faster.
-                </p>
-                <p>
-                  Each tool in my stack has earned its place not just through
-                  technical merit, but by enhancing my ability to create
-                  thoughtfully, reflect meaningfully, and grow continuously.
-                </p>
+        <motion.section
+          className="py-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7 }}
+        >
+          <motion.div
+            whileHover={{
+              boxShadow:
+                "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="p-8 bg-gradient-to-br from-amber-50 to-stone-50 dark:from-amber-900/10 dark:to-stone-800 border-amber-200 dark:border-stone-700">
+              <div className="text-center space-y-6">
+                <motion.h2
+                  className="text-2xl font-medium text-stone-800 dark:text-stone-200"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  On Choosing Tools
+                </motion.h2>
+                <motion.div
+                  className="max-w-3xl mx-auto space-y-4 text-stone-600 dark:text-stone-300 leading-relaxed"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  <p>
+                    I don't chase the latest frameworks or tools just because
+                    they're new. Instead, I choose technologies that align with
+                    my values: simplicity over complexity, sustainability over
+                    speed, and tools that make me think better rather than just
+                    work faster.
+                  </p>
+                  <p>
+                    Each tool in my stack has earned its place not just through
+                    technical merit, but by enhancing my ability to create
+                    thoughtfully, reflect meaningfully, and grow continuously.
+                  </p>
+                </motion.div>
+                <motion.blockquote
+                  className="text-lg text-stone-700 dark:text-stone-300 italic"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                >
+                  "The tools we choose shape not just our code, but our thinking
+                  patterns."
+                </motion.blockquote>
               </div>
-              <blockquote className="text-lg text-stone-700 dark:text-stone-300 italic">
-                "The tools we choose shape not just our code, but our thinking
-                patterns."
-              </blockquote>
-            </div>
-          </Card>
-        </section>
+            </Card>
+          </motion.div>
+        </motion.section>
 
         {/* Learning Stack */}
-        <section className="py-12">
+        <motion.section
+          className="py-12"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7 }}
+        >
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-light text-stone-800 dark:text-stone-100 mb-4">
+            <motion.h2
+              className="text-2xl font-light text-stone-800 dark:text-stone-100 mb-4"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               Currently Exploring
-            </h2>
-            <p className="text-stone-600 dark:text-stone-300">
+            </motion.h2>
+            <motion.p
+              className="text-stone-600 dark:text-stone-300"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
               Technologies I'm mindfully incorporating into my practice
-            </p>
+            </motion.p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700">
-              <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
-                Rust
-              </h3>
-              <p className="text-stone-600 dark:text-stone-300 text-sm">
-                Learning systems programming with a language that teaches memory
-                safety and performance mindfulness.
-              </p>
-            </Card>
+          <motion.div
+            className="grid md:grid-cols-3 gap-6"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.2,
+                },
+              },
+            }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-50px" }}
+          >
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: { opacity: 1, y: 0 },
+              }}
+              whileHover={{ scale: 1.03, y: -5 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Card className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 h-full">
+                <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
+                  Rust
+                </h3>
+                <p className="text-stone-600 dark:text-stone-300 text-sm">
+                  Learning systems programming with a language that teaches
+                  memory safety and performance mindfulness.
+                </p>
+              </Card>
+            </motion.div>
 
-            <Card className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700">
-              <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
-                Svelte
-              </h3>
-              <p className="text-stone-600 dark:text-stone-300 text-sm">
-                Exploring reactive frameworks that prioritize simplicity and
-                compile-time optimizations.
-              </p>
-            </Card>
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: { opacity: 1, y: 0 },
+              }}
+              whileHover={{ scale: 1.03, y: -5 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Card className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 h-full">
+                <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
+                  Svelte
+                </h3>
+                <p className="text-stone-600 dark:text-stone-300 text-sm">
+                  Exploring reactive frameworks that prioritize simplicity and
+                  compile-time optimizations.
+                </p>
+              </Card>
+            </motion.div>
 
-            <Card className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700">
-              <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
-                Deno
-              </h3>
-              <p className="text-stone-600 dark:text-stone-300 text-sm">
-                Investigating modern runtime environments that embrace web
-                standards and security by default.
-              </p>
-            </Card>
-          </div>
-        </section>
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: { opacity: 1, y: 0 },
+              }}
+              whileHover={{ scale: 1.03, y: -5 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Card className="p-6 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 h-full">
+                <h3 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
+                  Deno
+                </h3>
+                <p className="text-stone-600 dark:text-stone-300 text-sm">
+                  Investigating modern runtime environments that embrace web
+                  standards and security by default.
+                </p>
+              </Card>
+            </motion.div>
+          </motion.div>
+        </motion.section>
       </div>
     </main>
   );

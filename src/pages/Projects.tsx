@@ -15,6 +15,16 @@ import Link from "next/link";
 import { ProjectFrontmatter } from "@/lib/mdx";
 import { useRouter } from "next/navigation";
 import { formatDate } from "@/lib/utils";
+import { motion } from "framer-motion";
+
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6 },
+  },
+};
 
 const Projects = () => {
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
@@ -120,15 +130,30 @@ const Projects = () => {
     <main className="pt-20 pb-16">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
-        <section className="py-16 text-center">
-          <h1 className="text-4xl lg:text-5xl font-light text-stone-800 dark:text-stone-100 mb-6">
+        <motion.section
+          className="py-16 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          <motion.h1
+            className="text-4xl lg:text-5xl font-light text-stone-800 dark:text-stone-100 mb-6"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
             Mindful Builds
-          </h1>
-          <p className="text-xl text-stone-600 dark:text-stone-300 leading-relaxed max-w-3xl mx-auto">
+          </motion.h1>
+          <motion.p
+            className="text-xl text-stone-600 dark:text-stone-300 leading-relaxed max-w-3xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+          >
             Each project is a conversation between technical craft and personal
             growth, built with intention and reflection.
-          </p>
-        </section>
+          </motion.p>
+        </motion.section>
 
         {/* Projects Grid or Loading Animation */}
         <section className="space-y-16">
@@ -136,182 +161,373 @@ const Projects = () => {
             <LoadingAnimation />
           ) : (
             projects.map((project, index) => (
-              <Card
+              <motion.div
                 key={index}
-                ref={(el) => {
-                  cardRefs.current[index] = el;
-                  return null;
-                }}
-                className="p-8 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 hover:shadow-lg transition-all duration-300 relative overflow-hidden cursor-pointer"
-                onMouseEnter={() => setHoveredProject(index)}
-                onMouseLeave={() => setHoveredProject(null)}
-                onMouseMove={(e) => handleMouseMove(e, index)}
-                onClick={() => handleCardClick(project.slug)}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.7, delay: index * 0.2 }}
               >
-                {/* Cursor-following Thumbnail */}
-                {hoveredProject === index && (
-                  <div
-                    className="absolute z-20 pointer-events-none transition-all duration-200 ease-out"
-                    style={{
-                      width: "200px",
-                      height: "150px",
-                      left: `${mousePosition.x}px`,
-                      top: `${mousePosition.y}px`,
-                      transform: "translate(-50%, -50%)",
+                <Card
+                  ref={(el) => {
+                    cardRefs.current[index] = el;
+                    return null;
+                  }}
+                  className="p-8 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 hover:shadow-lg transition-all duration-300 relative overflow-hidden cursor-pointer"
+                  onMouseEnter={() => setHoveredProject(index)}
+                  onMouseLeave={() => setHoveredProject(null)}
+                  onMouseMove={(e) => handleMouseMove(e, index)}
+                  onClick={() => handleCardClick(project.slug)}
+                >
+                  {/* Cursor-following Thumbnail */}
+                  {hoveredProject === index && (
+                    <motion.div
+                      className="absolute z-20 pointer-events-none"
+                      style={{
+                        width: "200px",
+                        height: "150px",
+                        left: `${mousePosition.x}px`,
+                        top: `${mousePosition.y}px`,
+                        transform: "translate(-50%, -50%)",
+                      }}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{
+                        opacity: 1,
+                        scale: 1,
+                        x: 0,
+                        y: 0,
+                        rotate: [-2, 0, 2, 0],
+                        transition: {
+                          opacity: { duration: 0.3 },
+                          scale: { duration: 0.3 },
+                          rotate: {
+                            repeat: Infinity,
+                            duration: 5,
+                            ease: "easeInOut",
+                          },
+                        },
+                      }}
+                      transition={{
+                        type: "spring",
+                        damping: 25,
+                        stiffness: 300,
+                        mass: 0.5,
+                      }}
+                      drag
+                      dragConstraints={{
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                      }}
+                      dragElastic={0.1}
+                    >
+                      <motion.div
+                        className="w-full h-full rounded-lg overflow-hidden shadow-2xl border-2 border-amber-400 dark:border-amber-600"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <motion.img
+                          src={project.thumbnail}
+                          alt={`${project.title} thumbnail`}
+                          className="w-full h-full object-cover"
+                          initial={{ scale: 1 }}
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ duration: 0.8 }}
+                        />
+                      </motion.div>
+                    </motion.div>
+                  )}
+
+                  <div className="grid lg:grid-cols-3 gap-8">
+                    {/* Project Info */}
+                    <div className="lg:col-span-2 space-y-6">
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <motion.h2
+                            className="text-2xl font-medium text-stone-800 dark:text-stone-200 border-b-2 border-amber-400 dark:border-amber-600 inline-block pb-1"
+                            initial={{ width: "60%" }}
+                            whileInView={{ width: "auto" }}
+                            viewport={{ once: true }}
+                            transition={{
+                              duration: 0.5,
+                              delay: 0.3 + index * 0.2,
+                            }}
+                          >
+                            {project.title}
+                          </motion.h2>
+                          <div className="flex items-center gap-2">
+                            <motion.span
+                              className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                project.status === "Live"
+                                  ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                                  : project.status === "Beta"
+                                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
+                                  : "bg-stone-100 text-stone-700 dark:bg-stone-700 dark:text-stone-300"
+                              }`}
+                              initial={{ opacity: 0, x: 20 }}
+                              whileInView={{ opacity: 1, x: 0 }}
+                              viewport={{ once: true }}
+                              transition={{
+                                duration: 0.3,
+                                delay: 0.4 + index * 0.2,
+                              }}
+                            >
+                              {project.status}
+                            </motion.span>
+                            {project.featured && (
+                              <motion.span
+                                className="text-amber-500 dark:text-amber-400"
+                                initial={{ rotate: -180, opacity: 0 }}
+                                whileInView={{ rotate: 0, opacity: 1 }}
+                                viewport={{ once: true }}
+                                transition={{
+                                  duration: 0.5,
+                                  delay: 0.5 + index * 0.2,
+                                }}
+                              >
+                                <Sparkles size={16} />
+                              </motion.span>
+                            )}
+                          </div>
+                        </div>
+                        <motion.p
+                          className="text-lg text-amber-600 dark:text-amber-400 mb-4"
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{
+                            duration: 0.5,
+                            delay: 0.3 + index * 0.2,
+                          }}
+                        >
+                          {project.subtitle}
+                        </motion.p>
+                        <motion.div
+                          className="flex items-center text-stone-500 dark:text-stone-400 text-sm mb-4"
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{
+                            duration: 0.5,
+                            delay: 0.4 + index * 0.2,
+                          }}
+                        >
+                          <Calendar size={14} className="mr-1" />
+                          {project.date ? formatDate(project.date) : "No date"}
+                        </motion.div>
+                        <motion.p
+                          className="text-stone-600 dark:text-stone-300 leading-relaxed"
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{
+                            duration: 0.5,
+                            delay: 0.5 + index * 0.2,
+                          }}
+                        >
+                          {project.description}
+                        </motion.p>
+                      </div>
+
+                      {/* Problem & Approach */}
+                      <div className="space-y-4">
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{
+                            duration: 0.5,
+                            delay: 0.6 + index * 0.2,
+                          }}
+                        >
+                          <h4 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
+                            The Problem
+                          </h4>
+                          <p className="text-stone-600 dark:text-stone-300 text-sm">
+                            {project.problem}
+                          </p>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{
+                            duration: 0.5,
+                            delay: 0.7 + index * 0.2,
+                          }}
+                        >
+                          <h4 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
+                            My Approach
+                          </h4>
+                          <p className="text-stone-600 dark:text-stone-300 text-sm">
+                            {project.approach}
+                          </p>
+                        </motion.div>
+                      </div>
+
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-2">
+                        {project.tags.map((tag, tagIndex) => (
+                          <motion.span
+                            key={tagIndex}
+                            className="px-3 py-1 bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-300 rounded-full text-xs"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{
+                              duration: 0.3,
+                              delay: 0.8 + tagIndex * 0.1 + index * 0.2,
+                            }}
+                          >
+                            {tag}
+                          </motion.span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Learnings Section */}
+                    <motion.div
+                      className="space-y-6"
+                      initial={{ opacity: 0, x: 30 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: 0.7 + index * 0.2 }}
+                    >
+                      <div className="bg-gradient-to-br from-amber-50 to-stone-50 dark:from-amber-900/10 dark:to-stone-800 p-6 rounded-2xl">
+                        <h4 className="font-medium text-stone-800 dark:text-stone-200 mb-4">
+                          What I Learned
+                        </h4>
+                        <div className="space-y-3">
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{
+                              duration: 0.4,
+                              delay: 0.8 + index * 0.2,
+                            }}
+                          >
+                            <p className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide mb-1">
+                              Technical
+                            </p>
+                            <p className="text-stone-600 dark:text-stone-300 text-sm">
+                              {project.learnings.technical}
+                            </p>
+                          </motion.div>
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{
+                              duration: 0.4,
+                              delay: 0.9 + index * 0.2,
+                            }}
+                          >
+                            <p className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide mb-1">
+                              Personal
+                            </p>
+                            <p className="text-stone-600 dark:text-stone-300 text-sm">
+                              {project.learnings.personal}
+                            </p>
+                          </motion.div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+
+                  {/* "Click me!" indicator */}
+                  <motion.div
+                    className="absolute bottom-3 right-4"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{
+                      duration: 0.3,
+                      delay: 1 + index * 0.2,
+                      x: {
+                        repeat: Infinity,
+                        duration: 1.5,
+                      },
                     }}
                   >
-                    <div className="w-full h-full rounded-lg overflow-hidden shadow-2xl border-2 border-amber-400 dark:border-amber-600">
-                      <img
-                        src={project.thumbnail}
-                        alt={`${project.title} thumbnail`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="grid lg:grid-cols-3 gap-8">
-                  {/* Project Info */}
-                  <div className="lg:col-span-2 space-y-6">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <h2 className="text-2xl font-medium text-stone-800 dark:text-stone-200 border-b-2 border-amber-400 dark:border-amber-600 inline-block pb-1">
-                          {project.title}
-                        </h2>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              project.status === "Live"
-                                ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                                : project.status === "Beta"
-                                ? "bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
-                                : "bg-stone-100 text-stone-700 dark:bg-stone-700 dark:text-stone-300"
-                            }`}
-                          >
-                            {project.status}
-                          </span>
-                          {project.featured && (
-                            <span className="text-amber-500 dark:text-amber-400">
-                              <Sparkles size={16} />
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-lg text-amber-600 dark:text-amber-400 mb-4">
-                        {project.subtitle}
-                      </p>
-                      <div className="flex items-center text-stone-500 dark:text-stone-400 text-sm mb-4">
-                        <Calendar size={14} className="mr-1" />
-                        {project.date ? formatDate(project.date) : "No date"}
-                      </div>
-                      <p className="text-stone-600 dark:text-stone-300 leading-relaxed">
-                        {project.description}
-                      </p>
-                    </div>
-
-                    {/* Problem & Approach */}
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
-                          The Problem
-                        </h4>
-                        <p className="text-stone-600 dark:text-stone-300 text-sm">
-                          {project.problem}
-                        </p>
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-stone-800 dark:text-stone-200 mb-2">
-                          My Approach
-                        </h4>
-                        <p className="text-stone-600 dark:text-stone-300 text-sm">
-                          {project.approach}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2">
-                      {project.tags.map((tag, tagIndex) => (
-                        <span
-                          key={tagIndex}
-                          className="px-3 py-1 bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-300 rounded-full text-xs"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Learnings Section */}
-                  <div className="space-y-6">
-                    <div className="bg-gradient-to-br from-amber-50 to-stone-50 dark:from-amber-900/10 dark:to-stone-800 p-6 rounded-2xl">
-                      <h4 className="font-medium text-stone-800 dark:text-stone-200 mb-4">
-                        What I Learned
-                      </h4>
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide mb-1">
-                            Technical
-                          </p>
-                          <p className="text-stone-600 dark:text-stone-300 text-sm">
-                            {project.learnings.technical}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide mb-1">
-                            Personal
-                          </p>
-                          <p className="text-stone-600 dark:text-stone-300 text-sm">
-                            {project.learnings.personal}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* "Click me!" indicator */}
-                <div className="absolute bottom-3 right-4">
-                  <span className="text-xs italic text-stone-400 dark:text-stone-500 flex items-center">
-                    Hover on and Click me!{" "}
-                    <ArrowRight className="ml-1 w-3 h-3" />
-                  </span>
-                </div>
-              </Card>
+                    <span className="text-xs italic text-stone-400 dark:text-stone-500 flex items-center">
+                      Hover on and Click me!{" "}
+                      <ArrowRight className="ml-1 w-3 h-3" />
+                    </span>
+                  </motion.div>
+                </Card>
+              </motion.div>
             ))
           )}
         </section>
 
         {/* View All Projects Button */}
-        <div className="mt-8 text-center">
+        <motion.div
+          className="mt-8 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           <Link href="/project-gallery">
-            <Button
-              variant="outline"
-              className="border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
-            >
-              View All Projects <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                variant="outline"
+                className="border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+              >
+                View All Projects <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </motion.div>
           </Link>
-        </div>
+        </motion.div>
 
         {/* Call to Action */}
-        <section className="py-16 text-center">
+        <motion.section
+          className="py-16 text-center"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7 }}
+        >
           <div className="max-w-2xl mx-auto space-y-6">
-            <h2 className="text-2xl font-light text-stone-800 dark:text-stone-100">
+            <motion.h2
+              className="text-2xl font-light text-stone-800 dark:text-stone-100"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
               Interested in collaborating?
-            </h2>
-            <p className="text-stone-600 dark:text-stone-300">
+            </motion.h2>
+            <motion.p
+              className="text-stone-600 dark:text-stone-300"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
               I'm always open to projects that blend technical excellence with
               meaningful impact.
-            </p>
-            <Button
-              variant="outline"
-              className="border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 px-8 py-3 rounded-full"
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
             >
-              Let's Connect
-            </Button>
+              <Button
+                variant="outline"
+                className="border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 px-8 py-3 rounded-full"
+              >
+                Let's Connect
+              </Button>
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
       </div>
     </main>
   );

@@ -46,9 +46,9 @@ const JournalFilters: React.FC<JournalFiltersProps> = ({
   clearSearch,
 }) => {
   return (
-    <div className="flex flex-col md:flex-row gap-4 w-full">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-4 w-full">
       {/* Search Input */}
-      <div className="relative w-full md:w-64">
+      <div className="relative w-full md:w-64 mt-2 md:mt-0">
         <Search
           className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400"
           size={16}
@@ -73,7 +73,7 @@ const JournalFilters: React.FC<JournalFiltersProps> = ({
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-2 w-full md:w-auto">
+      <div className="flex flex-wrap gap-3 sm:gap-2 w-full md:w-auto mt-3 md:mt-0">
         <Select
           value={selectedCategory || "all"}
           onValueChange={(value) => {

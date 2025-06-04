@@ -343,7 +343,7 @@ const JournalExplorer = () => {
         <JournalExplorerHeader />
 
         {/* Filters and View Toggle */}
-        <section className="sticky top-0 z-10 bg-white/80 dark:bg-stone-900/80 backdrop-blur-md p-4 border-b border-stone-200 dark:border-stone-700 mb-8">
+        <section className="sticky top-0 z-10 bg-white/80 dark:bg-stone-900/80 backdrop-blur-md p-4 pt-6 sm:pt-4 border-b border-stone-200 dark:border-stone-700 mb-8">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             {/* View Mode Toggle */}
             <Tabs

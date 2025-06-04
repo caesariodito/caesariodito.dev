@@ -9,15 +9,13 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ children }) => {
 
   // Get grid columns based on screen size
   const getGridColumns = () => {
-    if (typeof window === "undefined")
-      return "repeat(auto-fill, minmax(300px, 1fr))";
+    if (typeof window === "undefined") return "repeat(3, 1fr)";
 
     const width = window.innerWidth;
-    if (width < 640) return "repeat(auto-fill, minmax(280px, 1fr))";
-    if (width < 768) return "repeat(auto-fill, minmax(280px, 1fr))";
-    if (width < 1024) return "repeat(auto-fill, minmax(300px, 1fr))";
-    if (width < 1280) return "repeat(auto-fill, minmax(320px, 1fr))";
-    return "repeat(auto-fill, minmax(350px, 1fr))";
+    if (width < 640) return "repeat(1, 1fr)";
+    if (width < 768) return "repeat(1, 1fr)";
+    if (width < 1024) return "repeat(2, 1fr)";
+    return "repeat(3, 1fr)"; // Always 3 columns for desktop and larger
   };
 
   // Update grid on resize
@@ -42,7 +40,11 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ children }) => {
   };
 
   return (
-    <div style={masonryGridStyles} ref={masonryRef} className="grid-container">
+    <div
+      style={masonryGridStyles}
+      ref={masonryRef}
+      className="grid-container mt-2"
+    >
       {children}
     </div>
   );
