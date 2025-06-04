@@ -59,6 +59,8 @@ const GraphView: React.FC<GraphViewProps> = ({
   setViewMode,
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  // Store zoom behavior in a ref to maintain it across renders
+  const zoomBehaviorRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown>>();
   const [graphData, setGraphData] = useState<GraphData>({
     nodes: [],
     links: [],
@@ -87,6 +89,17 @@ const GraphView: React.FC<GraphViewProps> = ({
       const height = node.clientHeight || 600;
       console.log("SVG mounted with dimensions:", width, height);
       setContainerDimensions({ width, height });
+
+      // Prevent browser zoom on wheel events
+      node.addEventListener(
+        "wheel",
+        (event) => {
+          if (event.ctrlKey) {
+            event.preventDefault();
+          }
+        },
+        { passive: false }
+      );
     }
   }, []);
 
@@ -124,14 +137,24 @@ const GraphView: React.FC<GraphViewProps> = ({
       // Clear previous graph
       svg.selectAll("*").remove();
 
-      // Create zoom behavior
+      // Create zoom behavior and store in ref
       const zoom = d3
         .zoom<SVGSVGElement, unknown>()
         .scaleExtent([0.1, 4])
         .on("zoom", (event) => {
           g.attr("transform", event.transform);
           setZoomLevel(event.transform.k);
+        })
+        // Filter out events from the controls area
+        .filter((event) => {
+          // Don't process zoom events if they originated from controls
+          const target = event.target as Element;
+          const isFromControls = target.closest(".graph-controls");
+          return !isFromControls && !event.ctrlKey && !event.button;
         });
+
+      // Store zoom behavior in ref for later use
+      zoomBehaviorRef.current = zoom;
 
       svg.call(zoom);
 
@@ -299,11 +322,24 @@ const GraphView: React.FC<GraphViewProps> = ({
         node.attr("transform", (d) => `translate(${d.x ?? 0},${d.y ?? 0})`);
       });
 
-      // Set initial zoom to fit the graph
+      // Add simulation end event to center on clusters when stabilized
+      simulation.on("end", () => {
+        console.log("Simulation ended, centering on clusters");
+        // Apply centering immediately after simulation ends
+        centerGraphOnClusters(svg, zoom);
+      });
+
+      // Set initial zoom while simulation is running
       svg.call(
         zoom.transform,
         d3.zoomIdentity.translate(width / 2, height / 2).scale(0.8)
       );
+
+      // Apply initial centering immediately for better UX
+      // This will be refined when simulation ends
+      setTimeout(() => {
+        centerGraphOnClusters(svg, zoom);
+      }, 100);
 
       console.log("D3 simulation started successfully");
       setSimulationInitialized(true);
@@ -319,31 +355,121 @@ const GraphView: React.FC<GraphViewProps> = ({
   }, [graphData, theme, svgMounted]);
 
   // Zoom control functions
-  const zoomIn = () => {
-    if (!svgRef.current) return;
+  const zoomIn = (e: React.MouseEvent | WheelEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!svgRef.current || !zoomBehaviorRef.current) return;
     const svg = d3.select(svgRef.current);
-    const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([0.1, 4]);
-    svg.transition().call(zoom.scaleBy, 1.3);
+    svg.transition().call(zoomBehaviorRef.current.scaleBy, 1.3);
   };
 
-  const zoomOut = () => {
-    if (!svgRef.current) return;
+  const zoomOut = (e: React.MouseEvent | WheelEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!svgRef.current || !zoomBehaviorRef.current) return;
     const svg = d3.select(svgRef.current);
-    const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([0.1, 4]);
-    svg.transition().call(zoom.scaleBy, 0.7);
+    svg.transition().call(zoomBehaviorRef.current.scaleBy, 0.7);
   };
 
-  const resetView = () => {
-    if (!svgRef.current) return;
+  const resetView = (e: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!svgRef.current || !zoomBehaviorRef.current) return;
     const svg = d3.select(svgRef.current);
-    const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([0.1, 4]);
+
+    // Center on the graph clusters instead of arbitrary center
+    centerGraphOnClusters(svg, zoomBehaviorRef.current);
+  };
+
+  // New function to center the graph on clusters
+  const centerGraphOnClusters = (
+    svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
+    zoom: d3.ZoomBehavior<Element, unknown>
+  ) => {
+    if (!svgRef.current || graphData.nodes.length === 0) return;
+
     const width = svgRef.current.clientWidth;
     const height = svgRef.current.clientHeight;
+
+    // Calculate bounding box of all nodes
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
+
+    // Count nodes with valid positions
+    let validNodeCount = 0;
+
+    graphData.nodes.forEach((node: D3Node) => {
+      // Type-safe access to x and y coordinates
+      const nodeX = node.x !== undefined ? node.x : null;
+      const nodeY = node.y !== undefined ? node.y : null;
+
+      if (nodeX !== null && nodeY !== null) {
+        minX = Math.min(minX, nodeX);
+        minY = Math.min(minY, nodeY);
+        maxX = Math.max(maxX, nodeX);
+        maxY = Math.max(maxY, nodeY);
+        validNodeCount++;
+      }
+    });
+
+    // If we couldn't determine bounds (nodes don't have positions yet) or too few nodes have positions
+    if (
+      minX === Infinity ||
+      minY === Infinity ||
+      maxX === -Infinity ||
+      maxY === -Infinity ||
+      validNodeCount < graphData.nodes.length * 0.5 // At least half of nodes should have positions
+    ) {
+      console.log("Using default center, not enough valid node positions");
+      // Fall back to default center
+      svg
+        .transition()
+        .duration(750)
+        .call(
+          zoom.transform,
+          d3.zoomIdentity.translate(width / 2, height / 2).scale(0.8)
+        );
+      return;
+    }
+
+    // Calculate center of the bounding box
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+
+    // Calculate scale to fit the graph with some padding
+    const boundWidth = Math.max(1, maxX - minX);
+    const boundHeight = Math.max(1, maxY - minY);
+
+    // Ensure we don't zoom too far in or out
+    const scale = Math.min(
+      Math.max(
+        0.5, // minimum scale
+        0.9 * Math.min(width / boundWidth, height / boundHeight)
+      ),
+      2.0 // maximum scale
+    );
+
+    console.log(
+      `Centering graph: centerX=${centerX}, centerY=${centerY}, scale=${scale}`
+    );
+
+    // Apply transform to center on the cluster with a smooth transition
     svg
       .transition()
+      .duration(750)
       .call(
         zoom.transform,
-        d3.zoomIdentity.translate(width / 2, height / 2).scale(0.8)
+        d3.zoomIdentity
+          .translate(width / 2 - centerX * scale, height / 2 - centerY * scale)
+          .scale(scale)
       );
   };
 
@@ -463,6 +589,41 @@ const GraphView: React.FC<GraphViewProps> = ({
     };
   }, []);
 
+  // Add a useEffect to handle wheel events globally for the SVG
+  useEffect(() => {
+    const handleWheel = (event: WheelEvent) => {
+      if (!svgRef.current) return;
+
+      // Check if the event is within the SVG element
+      const svgElement = svgRef.current;
+      const rect = svgElement.getBoundingClientRect();
+      const isInside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+
+      if (isInside) {
+        // Handle pinch zoom or ctrl+wheel zoom
+        if (event.ctrlKey || event.metaKey) {
+          event.preventDefault();
+          if (event.deltaY < 0) {
+            zoomIn(event);
+          } else {
+            zoomOut(event);
+          }
+        }
+      }
+    };
+
+    // Add the wheel event listener to the window
+    window.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
+
   // If entries are loading, show loading animation
   if (isLoading && journalEntries.length === 0) {
     return <LoadingAnimation />;
@@ -522,14 +683,13 @@ const GraphView: React.FC<GraphViewProps> = ({
         resetView={resetView}
         zoomLevel={zoomLevel}
         setZoomLevel={(level) => {
-          if (!svgRef.current) return;
+          if (!svgRef.current || !zoomBehaviorRef.current) return;
           const svg = d3.select(svgRef.current);
-          const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([0.1, 4]);
           const currentTransform = d3.zoomTransform(
             svg.node() as SVGSVGElement
           );
           const newScale = level / currentTransform.k;
-          svg.transition().call(zoom.scaleBy, newScale);
+          svg.transition().call(zoomBehaviorRef.current.scaleBy, newScale);
         }}
       />
     </div>
