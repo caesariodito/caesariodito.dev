@@ -28,12 +28,6 @@ const nextConfig = {
   // Optimize for Vercel deployment
   poweredByHeader: false,
 
-  // Handle both App Router and Pages Router
-  experimental: {
-    // Enable App Directory
-    appDir: true,
-  },
-
   // Configure source directories for Next.js
   transpilePackages: [],
 
