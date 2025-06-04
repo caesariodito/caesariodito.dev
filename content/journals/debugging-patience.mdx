@@ -1,0 +1,64 @@
+---
+title: "On Debugging Patience"
+date: "2024-03-15"
+category: "Technical Reflection"
+excerpt: "Spent 3 hours tracking down a race condition today. Initially frustrated, then realized this is exactly where growth happens..."
+mood: "🧘"
+growth: "Practiced mindful debugging—each console.log was an investigation, not a complaint."
+tags: ["debugging", "mindfulness", "growth"]
+wordCount: 342
+---
+
+# On Debugging Patience
+
+Today I spent nearly 3 hours tracking down a particularly nasty race condition in our authentication flow. It was one of those bugs that only appears in production, never in development, and only for certain users.
+
+## The Problem
+
+The issue appeared when users would try to log in while their session was being refreshed in the background. This would cause a strange state where:
+
+1. The UI would show them as logged in
+2. But API calls would fail with 401 errors
+3. Refreshing the page would log them out
+
+At first, I was getting frustrated. "Why can't I reproduce this locally?" I kept thinking. But then I realized: this is exactly where growth happens.
+
+## The Solution
+
+After methodically logging each step of the authentication process, I discovered that our [[TokenManager]] was storing tokens in memory before the API call to refresh them had fully resolved. This meant that if a user action triggered another auth check during this window, it would use the old token.
+
+The fix was relatively simple:
+
+```javascript
+// Before: Race condition
+function refreshToken() {
+  tokenStore.isRefreshing = true;
+  api.refresh().then((newToken) => {
+    tokenStore.token = newToken; // This happened too early
+    tokenStore.isRefreshing = false;
+  });
+}
+
+// After: Fixed
+async function refreshToken() {
+  tokenStore.isRefreshing = true;
+  try {
+    const newToken = await api.refresh();
+    tokenStore.token = newToken; // Now properly awaited
+  } finally {
+    tokenStore.isRefreshing = false;
+  }
+}
+```
+
+## The Reflection
+
+This experience reminded me that #debugging is as much about mindset as it is about technical skill. When I stopped seeing each console.log as a frustration and started seeing it as a clue, the process became almost meditative.
+
+I'm going to try applying this approach to other challenging tasks - viewing obstacles as opportunities for #mindfulness rather than sources of stress.
+
+Related to my work on the [[AuthenticationFlow]] and connects to my previous thoughts on [[AsyncPatterns]].
+
+## Growth Moment
+
+I'm proud that I didn't take the easy way out by adding a hacky fix. Instead, I took the time to understand the root cause and implement a proper solution that will prevent similar issues in the future. This kind of #growth is what separates senior developers from junior ones - not the ability to avoid bugs, but the patience to solve them properly.
