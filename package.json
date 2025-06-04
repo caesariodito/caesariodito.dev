@@ -6,9 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
-    "update-browserslist": "npx update-browserslist-db@latest",
-    "postinstall": "npm run update-browserslist"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
