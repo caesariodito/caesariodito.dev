@@ -10,6 +10,7 @@ export interface GraphNode {
   radius?: number;
   x?: number;
   y?: number;
+  isMatch?: boolean;
 }
 
 export interface GraphLink {

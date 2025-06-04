@@ -12,7 +12,7 @@ import { GraphNode, GraphLink, GraphData } from "./types";
 import GraphControls from "./GraphControls";
 import NodePreview from "./NodePreview";
 import LoadingAnimation from "../common/LoadingAnimation";
-import { Network } from "lucide-react";
+import { Network, Grid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface GraphViewProps {
@@ -21,6 +21,9 @@ interface GraphViewProps {
   handleEntryClick: (slug: string) => void;
   handleTagClick: (tag: string, e: React.MouseEvent) => void;
   setViewMode: (mode: "gallery" | "graph") => void;
+  searchQuery: string;
+  selectedCategory: string | null;
+  selectedTag: string | null;
 }
 
 // Helper types for D3
@@ -87,6 +90,9 @@ const GraphView: React.FC<GraphViewProps> = ({
   handleEntryClick,
   handleTagClick,
   setViewMode,
+  searchQuery,
+  selectedCategory,
+  selectedTag,
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   // Store zoom behavior in a ref to maintain it across renders
@@ -122,6 +128,8 @@ const GraphView: React.FC<GraphViewProps> = ({
   });
   // Add a state to track when the SVG is mounted
   const [svgMounted, setSvgMounted] = useState(false);
+  // Add a state to track when filters change for smooth transitions
+  const [isFilterTransitioning, setIsFilterTransitioning] = useState(false);
 
   // Add a mouse move handler to track mouse position
   useEffect(() => {
@@ -465,6 +473,11 @@ const GraphView: React.FC<GraphViewProps> = ({
           return theme === "dark" ? "#292524" : "#f5f5f4";
         })
         .attr("stroke", (d) => {
+          // Highlight matched nodes with a different color
+          if (d.isMatch) {
+            return theme === "dark" ? "#22c55e" : "#16a34a"; // Green highlight for matches
+          }
+
           if (d.type === "journal")
             return theme === "dark" ? "#fbbf24" : "#d97706";
           if (d.type === "tag") return theme === "dark" ? "#fbbf24" : "#d97706";
@@ -472,9 +485,32 @@ const GraphView: React.FC<GraphViewProps> = ({
             return theme === "dark" ? "#a8a29e" : "#78716c";
           return theme === "dark" ? "#57534e" : "#d6d3d1";
         })
-        .attr("stroke-width", 2)
+        .attr("stroke-width", (d) => (d.isMatch ? 3 : 2)) // Thicker border for matched nodes
+        .attr("stroke-opacity", (d) => (d.isMatch ? 1 : 0.8)) // Full opacity for matched nodes
         // Ensure circle has pointer events
-        .style("pointer-events", "all");
+        .style("pointer-events", "all")
+        // Add pulsing animation for matched nodes
+        .each(function (d) {
+          if (d.isMatch) {
+            const node = d3.select(this);
+
+            // Create a pulsing effect for matched nodes
+            const pulse = () => {
+              node
+                .transition()
+                .duration(1000)
+                .attr("stroke-width", 4)
+                .attr("stroke-opacity", 1)
+                .transition()
+                .duration(1000)
+                .attr("stroke-width", 3)
+                .attr("stroke-opacity", 0.7)
+                .on("end", pulse);
+            };
+
+            pulse();
+          }
+        });
 
       // Add invisible larger hit area for better hover detection
       node
@@ -701,12 +737,47 @@ const GraphView: React.FC<GraphViewProps> = ({
       );
   };
 
-  // Update the fetch graph data effect to always run when journalEntries change
+  // Add effect to detect filter changes
+  useEffect(() => {
+    // Skip the first render
+    if (graphData.nodes.length === 0) return;
+
+    // Set transition state when filters change
+    setIsFilterTransitioning(true);
+
+    // Reset transition state after animation completes
+    const timer = setTimeout(() => {
+      setIsFilterTransitioning(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedCategory, selectedTag]);
+
+  // Update the fetch graph data effect to include transition handling
   useEffect(() => {
     const fetchGraphData = async () => {
       try {
         console.log("Fetching graph data from API...");
-        const response = await fetch("/api/journals/graph");
+
+        // Build query parameters for filtering
+        const queryParams = new URLSearchParams();
+        if (searchQuery) queryParams.append("q", searchQuery);
+        if (selectedCategory) queryParams.append("category", selectedCategory);
+        if (selectedTag) queryParams.append("tag", selectedTag);
+
+        const queryString = queryParams.toString();
+        const endpoint = `/api/journals/graph${
+          queryString ? `?${queryString}` : ""
+        }`;
+
+        console.log("Fetching graph data with params:", queryString);
+
+        // Show loading state during filter transitions
+        if (searchQuery || selectedCategory || selectedTag) {
+          setIsFilterTransitioning(true);
+        }
+
+        const response = await fetch(endpoint);
         const data = await response.json();
         console.log("Received graph data from API:", data);
 
@@ -716,8 +787,25 @@ const GraphView: React.FC<GraphViewProps> = ({
           const tagNodes: Set<string> = new Set();
           const categoryNodes: Set<string> = new Set();
 
+          // Track matched journal nodes for highlighting
+          const matchedJournalIds = new Set<string>();
+
           // Process journal nodes
           data.nodes.forEach((entry: GraphNodeResponse) => {
+            // Check if this is a direct match to our search criteria
+            const isDirectMatch =
+              (!searchQuery && !selectedCategory && !selectedTag) || // No filters applied
+              (searchQuery &&
+                entry.label
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase())) ||
+              (selectedCategory && entry.category === selectedCategory) ||
+              (selectedTag && entry.tags?.includes(selectedTag));
+
+            if (isDirectMatch) {
+              matchedJournalIds.add(entry.id);
+            }
+
             // Add journal node
             nodes.push({
               id: entry.id,
@@ -732,6 +820,7 @@ const GraphView: React.FC<GraphViewProps> = ({
                 30,
                 Math.min(50, (entry.wordCount / 1000) * 40 + 30)
               ),
+              isMatch: isDirectMatch, // Add flag for highlighting
             });
 
             // Add category if it doesn't exist
@@ -742,6 +831,7 @@ const GraphView: React.FC<GraphViewProps> = ({
                 type: "category",
                 label: entry.category,
                 radius: 25,
+                isMatch: selectedCategory === entry.category, // Highlight if selected
               });
             }
 
@@ -766,6 +856,7 @@ const GraphView: React.FC<GraphViewProps> = ({
                     type: "tag",
                     label: tag,
                     radius: 15,
+                    isMatch: selectedTag === tag, // Highlight if selected
                   });
                 }
 
@@ -782,17 +873,23 @@ const GraphView: React.FC<GraphViewProps> = ({
 
           console.log("Processed graph data:", { nodes, links });
           setGraphData({ nodes, links });
+
+          // Reset transition state after a delay to allow animations to complete
+          setTimeout(() => {
+            setIsFilterTransitioning(false);
+          }, 1000);
         }
       } catch (error) {
         console.error("Error fetching graph data:", error);
+        setIsFilterTransitioning(false);
       }
     };
 
-    // Fetch graph data whenever journalEntries changes
+    // Fetch graph data whenever journalEntries changes or filter criteria change
     if (journalEntries.length > 0) {
       fetchGraphData();
     }
-  }, [journalEntries]);
+  }, [journalEntries, searchQuery, selectedCategory, selectedTag]);
 
   // Add a useEffect to update dimensions and SVG container rect on window resize
   useEffect(() => {
@@ -943,33 +1040,50 @@ const GraphView: React.FC<GraphViewProps> = ({
   }
 
   return (
-    <div className="relative w-full h-[calc(100vh-300px)] min-h-[500px] border border-stone-200 dark:border-stone-700 rounded-lg overflow-hidden">
-      <svg
-        ref={svgCallback}
-        className="w-full h-full bg-white dark:bg-stone-900"
-        width={containerDimensions.width}
-        height={containerDimensions.height}
-      />
-
-      {/* Node preview on hover - only render when we have both hoveredNode and svgContainerRect */}
-      {hoveredNode && svgContainerRect && (
-        <NodePreview
-          node={hoveredNode}
-          position={hoverPosition}
-          svgContainerRect={svgContainerRect}
-          zoomLevel={zoomLevel}
-          onMouseEnter={() => {
-            // Dispatch custom event when mouse enters preview
-            document.dispatchEvent(new Event("preview-mouseenter"));
-          }}
-          onMouseLeave={() => {
-            // Dispatch custom event when mouse leaves preview
-            document.dispatchEvent(new Event("preview-mouseleave"));
-          }}
-        />
+    <div className="relative w-full h-[600px] bg-stone-100 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700 overflow-hidden">
+      {/* Loading overlay */}
+      {(isLoading || isFilterTransitioning) && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-stone-900/50 backdrop-blur-sm z-20">
+          <LoadingAnimation />
+          <p className="ml-3 text-lg font-medium">
+            {isFilterTransitioning ? "Updating graph..." : "Loading graph..."}
+          </p>
+        </div>
       )}
 
-      {/* Zoom controls */}
+      {/* Empty state */}
+      {!isLoading && graphData.nodes.length === 0 && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <Network size={48} className="text-stone-400 mb-4" />
+          <h3 className="text-xl font-semibold mb-2">
+            No journal connections found
+          </h3>
+          <p className="text-stone-500 dark:text-stone-400 mb-6 text-center max-w-md">
+            {searchQuery || selectedCategory || selectedTag
+              ? "Try adjusting your search filters to see connections"
+              : "Add more journal entries to start building connections"}
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => setViewMode("gallery")}
+            className="flex items-center gap-2"
+          >
+            <Grid size={16} /> Switch to Gallery View
+          </Button>
+        </div>
+      )}
+
+      {/* Graph visualization */}
+      <svg
+        ref={svgCallback}
+        className="w-full h-full"
+        style={{
+          opacity: isFilterTransitioning ? 0.5 : 1,
+          transition: "opacity 0.3s ease",
+        }}
+      />
+
+      {/* Controls */}
       <GraphControls
         zoomIn={zoomIn}
         zoomOut={zoomOut}
@@ -985,6 +1099,24 @@ const GraphView: React.FC<GraphViewProps> = ({
           svg.transition().call(zoomBehaviorRef.current.scaleBy, newScale);
         }}
       />
+
+      {/* Node preview */}
+      {hoveredNode && (
+        <NodePreview
+          node={hoveredNode}
+          position={hoverPosition}
+          svgContainerRect={svgContainerRect}
+          zoomLevel={zoomLevel}
+          onMouseEnter={() => {
+            // Dispatch custom event when mouse enters preview
+            document.dispatchEvent(new Event("preview-mouseenter"));
+          }}
+          onMouseLeave={() => {
+            // Dispatch custom event when mouse leaves preview
+            document.dispatchEvent(new Event("preview-mouseleave"));
+          }}
+        />
+      )}
     </div>
   );
 };

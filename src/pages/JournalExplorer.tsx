@@ -431,6 +431,9 @@ const JournalExplorer = () => {
                 handleEntryClick={handleEntryClick}
                 handleTagClick={handleTagClick}
                 setViewMode={setViewMode}
+                searchQuery={searchQuery}
+                selectedCategory={selectedCategory}
+                selectedTag={selectedTag}
               />
             </TabsContent>
           </Tabs>
