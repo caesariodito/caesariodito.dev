@@ -92,7 +92,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
           {/* Growth moment preview */}
           {entry.growth && (
             <motion.div
-              className="bg-gradient-to-r from-amber-50 to-stone-50 dark:from-amber-900/10 dark:to-stone-800 p-2 rounded-lg border-l-2 border-amber-400 mb-2"
+              className="bg-gradient-to-r from-amber-50 to-stone-50 dark:from-amber-900/10 dark:to-stone-800 p-3 rounded-lg border-l-2 border-amber-400 mb-2"
               whileHover={{ x: 5 }}
               transition={{ duration: 0.2 }}
             >
