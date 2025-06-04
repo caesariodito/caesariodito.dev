@@ -51,6 +51,19 @@ interface GraphNodeResponse {
   tags?: string[];
 }
 
+// Debounce function to prevent rapid state changes
+function debounce<F extends (...args: unknown[]) => void>(
+  func: F,
+  wait: number
+): (...args: Parameters<F>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  return function (...args: Parameters<F>) {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
+
 const GraphView: React.FC<GraphViewProps> = ({
   journalEntries,
   isLoading,
@@ -69,6 +82,12 @@ const GraphView: React.FC<GraphViewProps> = ({
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
+  // Add a ref to track the current hovered node to prevent flickering
+  const hoveredNodeRef = useRef<string | null>(null);
+  // Add a timeout ref to manage debounced hover state
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Add a flag to track if mouse is over the preview
+  const isMouseOverPreviewRef = useRef<boolean>(false);
   const { theme } = useTheme();
   const [simulationInitialized, setSimulationInitialized] = useState(false);
   const [containerDimensions, setContainerDimensions] = useState({
@@ -77,6 +96,45 @@ const GraphView: React.FC<GraphViewProps> = ({
   });
   // Add a state to track when the SVG is mounted
   const [svgMounted, setSvgMounted] = useState(false);
+
+  // Debounced version of setHoveredNode to prevent flickering
+  // Increased debounce time from 50ms to 100ms for better stability
+  const debouncedSetHoveredNode = useCallback(
+    debounce((node: GraphNode | null, position?: { x: number; y: number }) => {
+      setHoveredNode(node);
+      if (position) setHoverPosition(position);
+    }, 100),
+    []
+  );
+
+  // Function to clear hover state immediately
+  const clearHoverState = useCallback(() => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    hoveredNodeRef.current = null;
+    setHoveredNode(null);
+  }, []);
+
+  // Function to safely set hover state with node proximity check
+  const safeSetHoveredNode = useCallback(
+    (node: GraphNode | null, position?: { x: number; y: number }) => {
+      // If we're already hovering this node, don't do anything
+      if (node && hoveredNodeRef.current === node.id) return;
+
+      // Clear any pending timeouts
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+        hoverTimeoutRef.current = null;
+      }
+
+      // Update hover state
+      hoveredNodeRef.current = node ? node.id : null;
+      debouncedSetHoveredNode(node, position);
+    },
+    [debouncedSetHoveredNode]
+  );
 
   // Add a callback ref to detect when SVG is mounted
   const svgCallback = useCallback((node: SVGSVGElement | null) => {
@@ -144,6 +202,9 @@ const GraphView: React.FC<GraphViewProps> = ({
         .on("zoom", (event) => {
           g.attr("transform", event.transform);
           setZoomLevel(event.transform.k);
+
+          // Clear hover state when zooming to prevent misplaced tooltips
+          clearHoverState();
         })
         // Filter out events from the controls area
         .filter((event) => {
@@ -191,6 +252,9 @@ const GraphView: React.FC<GraphViewProps> = ({
         if (!event.active) simulation.alphaTarget(0.3).restart();
         event.subject.fx = event.subject.x;
         event.subject.fy = event.subject.y;
+
+        // Clear hover state when dragging starts
+        clearHoverState();
       };
 
       const handleDrag = (
@@ -235,6 +299,7 @@ const GraphView: React.FC<GraphViewProps> = ({
         .data(graphData.nodes as D3Node[])
         .enter()
         .append("g")
+        .attr("class", "node-group")
         .call(
           d3
             .drag<SVGGElement, D3Node>()
@@ -253,16 +318,49 @@ const GraphView: React.FC<GraphViewProps> = ({
           }
         })
         .on("mouseover", (event, d) => {
-          setHoveredNode(d);
+          // Prevent mouseout/mouseover cycle by checking if we're already hovering this node
+          if (hoveredNodeRef.current === d.id) return;
+
+          // Cancel any pending hover clear operations
+          if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+            hoverTimeoutRef.current = null;
+          }
+
+          // Set the currently hovered node ID in the ref
+          hoveredNodeRef.current = d.id;
+
+          // Calculate position for the tooltip
           const [x, y] = d3.pointer(event);
           const transform = d3.zoomTransform(svg.node() as SVGSVGElement);
-          setHoverPosition({
-            x: x + transform.x,
-            y: y + transform.y,
+
+          // Adjust position based on zoom level to prevent overlap
+          const adjustedY = y + transform.y;
+          const adjustedX = x + transform.x;
+
+          // Use the debounced setter to prevent flickering
+          debouncedSetHoveredNode(d, {
+            x: adjustedX,
+            y: adjustedY,
           });
+
+          // Add hover class to the node for visual feedback
+          d3.select(event.currentTarget).classed("node-hovered", true);
         })
-        .on("mouseout", () => {
-          setHoveredNode(null);
+        .on("mouseout", (event) => {
+          // Don't clear hover state immediately if mouse is over the preview
+          if (isMouseOverPreviewRef.current) return;
+
+          // Use a longer timeout to prevent immediate clearing of hover state
+          // This helps prevent flickering when the mouse moves between the node and its tooltip
+          hoverTimeoutRef.current = setTimeout(() => {
+            // Only clear if mouse is not over preview
+            if (!isMouseOverPreviewRef.current) {
+              hoveredNodeRef.current = null;
+              setHoveredNode(null);
+              d3.select(event.currentTarget).classed("node-hovered", false);
+            }
+          }, 200); // Increased from 100ms to 200ms for better stability
         });
 
       // Add circles to nodes
@@ -286,6 +384,13 @@ const GraphView: React.FC<GraphViewProps> = ({
           return theme === "dark" ? "#57534e" : "#d6d3d1";
         })
         .attr("stroke-width", 2);
+
+      // Add invisible larger hit area for better hover detection
+      node
+        .append("circle")
+        .attr("r", (d) => (d.radius || 30) + 10)
+        .attr("fill", "transparent")
+        .style("pointer-events", "all");
 
       // Add labels to nodes
       node
@@ -341,6 +446,16 @@ const GraphView: React.FC<GraphViewProps> = ({
         centerGraphOnClusters(svg, zoom);
       }, 100);
 
+      // Add CSS for hover effects
+      const style = document.createElement("style");
+      style.textContent = `
+        .node-hovered circle:first-child {
+          stroke-width: 3px;
+          stroke-opacity: 1;
+        }
+      `;
+      document.head.appendChild(style);
+
       console.log("D3 simulation started successfully");
       setSimulationInitialized(true);
 
@@ -348,11 +463,13 @@ const GraphView: React.FC<GraphViewProps> = ({
       return () => {
         console.log("Cleaning up D3 simulation");
         simulation.stop();
+        document.head.removeChild(style);
+        clearHoverState();
       };
     } catch (error) {
       console.error("Error initializing D3:", error);
     }
-  }, [graphData, theme, svgMounted]);
+  }, [graphData, theme, svgMounted, clearHoverState]);
 
   // Zoom control functions
   const zoomIn = (e: React.MouseEvent | WheelEvent) => {
@@ -624,6 +741,47 @@ const GraphView: React.FC<GraphViewProps> = ({
     };
   }, []);
 
+  // Add a useEffect to handle preview hover state
+  useEffect(() => {
+    // Create custom event handlers for preview hover
+    const handlePreviewMouseEnter = () => {
+      // When mouse enters the preview, clear any pending timeouts to prevent hiding
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+        hoverTimeoutRef.current = null;
+      }
+      isMouseOverPreviewRef.current = true;
+    };
+
+    const handlePreviewMouseLeave = () => {
+      isMouseOverPreviewRef.current = false;
+
+      // When mouse leaves the preview, set a timeout to hide it
+      // Only if we're not hovering over a node
+      if (!hoveredNodeRef.current) {
+        hoverTimeoutRef.current = setTimeout(() => {
+          setHoveredNode(null);
+        }, 200);
+      }
+    };
+
+    // Add event listeners to document for custom events
+    document.addEventListener("preview-mouseenter", handlePreviewMouseEnter);
+    document.addEventListener("preview-mouseleave", handlePreviewMouseLeave);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener(
+        "preview-mouseenter",
+        handlePreviewMouseEnter
+      );
+      document.removeEventListener(
+        "preview-mouseleave",
+        handlePreviewMouseLeave
+      );
+    };
+  }, []);
+
   // If entries are loading, show loading animation
   if (isLoading && journalEntries.length === 0) {
     return <LoadingAnimation />;
@@ -673,7 +831,18 @@ const GraphView: React.FC<GraphViewProps> = ({
 
       {/* Node preview on hover */}
       {hoveredNode && (
-        <NodePreview node={hoveredNode} position={hoverPosition} />
+        <NodePreview
+          node={hoveredNode}
+          position={hoverPosition}
+          onMouseEnter={() => {
+            // Dispatch custom event when mouse enters preview
+            document.dispatchEvent(new Event("preview-mouseenter"));
+          }}
+          onMouseLeave={() => {
+            // Dispatch custom event when mouse leaves preview
+            document.dispatchEvent(new Event("preview-mouseleave"));
+          }}
+        />
       )}
 
       {/* Zoom controls */}

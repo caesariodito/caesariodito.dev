@@ -1,28 +1,115 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { formatDate } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Calendar, Hash } from "lucide-react";
-import { GraphNode } from "./types";
+import type { GraphNode } from "@/components/journal-explorer/GraphView/types";
 
 interface NodePreviewProps {
   node: GraphNode | null;
   position: { x: number; y: number };
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
-const NodePreview: React.FC<NodePreviewProps> = ({ node, position }) => {
+const NodePreview: React.FC<NodePreviewProps> = ({
+  node,
+  position,
+  onMouseEnter,
+  onMouseLeave,
+}) => {
+  const previewRef = useRef<HTMLDivElement>(null);
+  const [adjustedPosition, setAdjustedPosition] = useState(position);
+  const [isHovered, setIsHovered] = useState(false);
+  const positionRef = useRef(position);
+
+  // Update position ref when position changes
+  useEffect(() => {
+    positionRef.current = position;
+  }, [position]);
+
+  // Adjust position to avoid going out of viewport and prevent overlap with node
+  useEffect(() => {
+    if (!previewRef.current) return;
+
+    const previewRect = previewRef.current.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Calculate adjusted position
+    let adjustedX = position.x;
+    let adjustedY = position.y + 20; // Default offset below the node
+
+    // Add a minimum distance from the node to prevent immediate mouseout
+    const minDistance = 15;
+
+    // Adjust horizontally if needed
+    if (position.x + previewRect.width > viewportWidth - 20) {
+      adjustedX = position.x - previewRect.width - minDistance;
+    } else {
+      adjustedX = position.x + minDistance;
+    }
+
+    // Adjust vertically if needed
+    if (position.y + previewRect.height > viewportHeight - 20) {
+      adjustedY = position.y - previewRect.height - minDistance; // Place above the node
+    } else {
+      adjustedY = position.y + minDistance; // Place below the node with minimum distance
+    }
+
+    // Ensure the tooltip doesn't jump around too much
+    const prevPosition = adjustedPosition;
+    const distance = Math.sqrt(
+      Math.pow(prevPosition.x - adjustedX, 2) +
+        Math.pow(prevPosition.y - adjustedY, 2)
+    );
+
+    // Only update position if it's significantly different (prevents small jitters)
+    if (distance > 5) {
+      setAdjustedPosition({ x: adjustedX, y: adjustedY });
+    }
+  }, [position, adjustedPosition]);
+
   if (!node) return null;
 
-  // Position the preview card to avoid going out of viewport
+  // Style with adjusted position and transition for smoother movement
   const style = {
-    left: `${position.x}px`,
-    top: `${position.y + 20}px`,
+    left: `${adjustedPosition.x}px`,
+    top: `${adjustedPosition.y}px`,
+    // Allow pointer events so we can hover the preview
+    pointerEvents: "auto" as const,
+    zIndex: 1000,
+    // Add transition for smoother movement
+    transition: "left 0.1s ease-out, top 0.1s ease-out",
+  };
+
+  // Handle mouse events with improved event handling
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    // Stop propagation to prevent interference with other events
+    e.stopPropagation();
+    setIsHovered(true);
+    if (onMouseEnter) onMouseEnter();
+  };
+
+  const handleMouseLeave = (e: React.MouseEvent) => {
+    // Stop propagation to prevent interference with other events
+    e.stopPropagation();
+    setIsHovered(false);
+    if (onMouseLeave) onMouseLeave();
+  };
+
+  // Common props for all card types
+  const commonCardProps = {
+    ref: previewRef,
+    style,
+    onMouseEnter: handleMouseEnter,
+    onMouseLeave: handleMouseLeave,
   };
 
   if (node.type === "journal") {
     return (
       <Card
-        className="absolute z-50 w-64 bg-white/95 dark:bg-stone-800/95 shadow-lg p-4"
-        style={style}
+        {...commonCardProps}
+        className="absolute z-50 w-64 bg-white/95 dark:bg-stone-800/95 shadow-lg p-4 preview-card"
       >
         <div className="flex items-start gap-2 mb-2">
           <span className="text-xl">{node.mood}</span>
@@ -49,8 +136,8 @@ const NodePreview: React.FC<NodePreviewProps> = ({ node, position }) => {
   if (node.type === "tag") {
     return (
       <Card
-        className="absolute z-50 bg-white/95 dark:bg-stone-800/95 shadow-lg p-3"
-        style={style}
+        {...commonCardProps}
+        className="absolute z-50 bg-white/95 dark:bg-stone-800/95 shadow-lg p-3 preview-card"
       >
         <div className="flex items-center">
           <Hash size={12} className="mr-1 text-amber-500" />
@@ -64,8 +151,8 @@ const NodePreview: React.FC<NodePreviewProps> = ({ node, position }) => {
   if (node.type === "category") {
     return (
       <Card
-        className="absolute z-50 bg-white/95 dark:bg-stone-800/95 shadow-lg p-3"
-        style={style}
+        {...commonCardProps}
+        className="absolute z-50 bg-white/95 dark:bg-stone-800/95 shadow-lg p-3 preview-card"
       >
         <div className="font-medium">{node.label}</div>
         <div className="text-xs mt-1">Category grouping</div>
