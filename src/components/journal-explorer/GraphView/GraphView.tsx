@@ -192,7 +192,6 @@ const GraphView: React.FC<GraphViewProps> = ({
       // Update dimensions immediately when ref is available
       const width = node.clientWidth || 800;
       const height = node.clientHeight || 600;
-      console.log("SVG mounted with dimensions:", width, height);
       setContainerDimensions({ width, height });
 
       // Get and store the SVG container's bounding rect
@@ -224,28 +223,17 @@ const GraphView: React.FC<GraphViewProps> = ({
     }
   }, []);
 
-  // Add console logs to debug the loading issue
+  // Remove console logs that were used for debugging
   useEffect(() => {
-    console.log("Journal entries:", journalEntries);
-    console.log("Graph data nodes:", graphData.nodes);
-    console.log("Simulation initialized:", simulationInitialized);
-    console.log("SVG mounted:", svgMounted);
+    // Removed console.log statements
   }, [journalEntries, graphData, simulationInitialized, svgMounted]);
 
   // Initialize D3 force simulation
   useLayoutEffect(() => {
-    console.log(
-      "D3 init effect running, nodes:",
-      graphData.nodes.length,
-      "svgRef:",
-      !!svgRef.current,
-      "svgMounted:",
-      svgMounted
-    );
+    // Removed console.log statements
 
     // Only proceed if both SVG is mounted and we have graph data
     if (!svgRef.current || !svgMounted || graphData.nodes.length === 0) {
-      console.log("Skipping D3 initialization - missing ref or no nodes");
       return;
     }
 
@@ -253,7 +241,6 @@ const GraphView: React.FC<GraphViewProps> = ({
       const svg = d3.select(svgRef.current);
       const width = svgRef.current.clientWidth || 800;
       const height = svgRef.current.clientHeight || 600;
-      console.log("SVG dimensions:", width, height);
 
       // Clear previous graph
       svg.selectAll("*").remove();
@@ -564,7 +551,6 @@ const GraphView: React.FC<GraphViewProps> = ({
 
       // Add simulation end event to center on clusters when stabilized
       simulation.on("end", () => {
-        console.log("Simulation ended, centering on clusters");
         // Apply centering immediately after simulation ends
         centerGraphOnClusters(svg, zoom);
       });
@@ -603,12 +589,10 @@ const GraphView: React.FC<GraphViewProps> = ({
       `;
       document.head.appendChild(style);
 
-      console.log("D3 simulation started successfully");
       setSimulationInitialized(true);
 
       // Cleanup
       return () => {
-        console.log("Cleaning up D3 simulation");
         simulation.stop();
         document.head.removeChild(style);
         clearHoverState();
@@ -692,7 +676,6 @@ const GraphView: React.FC<GraphViewProps> = ({
       maxY === -Infinity ||
       validNodeCount < graphData.nodes.length * 0.5 // At least half of nodes should have positions
     ) {
-      console.log("Using default center, not enough valid node positions");
       // Fall back to default center
       svg
         .transition()
@@ -719,10 +702,6 @@ const GraphView: React.FC<GraphViewProps> = ({
         0.9 * Math.min(width / boundWidth, height / boundHeight)
       ),
       2.0 // maximum scale
-    );
-
-    console.log(
-      `Centering graph: centerX=${centerX}, centerY=${centerY}, scale=${scale}`
     );
 
     // Apply transform to center on the cluster with a smooth transition
@@ -757,8 +736,6 @@ const GraphView: React.FC<GraphViewProps> = ({
   useEffect(() => {
     const fetchGraphData = async () => {
       try {
-        console.log("Fetching graph data from API...");
-
         // Build query parameters for filtering
         const queryParams = new URLSearchParams();
         if (searchQuery) queryParams.append("q", searchQuery);
@@ -770,8 +747,6 @@ const GraphView: React.FC<GraphViewProps> = ({
           queryString ? `?${queryString}` : ""
         }`;
 
-        console.log("Fetching graph data with params:", queryString);
-
         // Show loading state during filter transitions
         if (searchQuery || selectedCategory || selectedTag) {
           setIsFilterTransitioning(true);
@@ -779,7 +754,6 @@ const GraphView: React.FC<GraphViewProps> = ({
 
         const response = await fetch(endpoint);
         const data = await response.json();
-        console.log("Received graph data from API:", data);
 
         if (data && data.nodes) {
           const nodes: GraphNode[] = [];
@@ -871,7 +845,6 @@ const GraphView: React.FC<GraphViewProps> = ({
             }
           });
 
-          console.log("Processed graph data:", { nodes, links });
           setGraphData({ nodes, links });
 
           // Reset transition state after a delay to allow animations to complete
@@ -897,7 +870,6 @@ const GraphView: React.FC<GraphViewProps> = ({
       if (svgRef.current) {
         const width = svgRef.current.clientWidth || 800;
         const height = svgRef.current.clientHeight || 600;
-        console.log("Updated SVG dimensions:", width, height);
         setContainerDimensions({ width, height });
 
         // Update SVG container rect on resize
