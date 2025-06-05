@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/ui/button";
@@ -97,9 +98,16 @@ const Navigation = () => {
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="text-xl font-medium text-stone-800 dark:text-stone-200 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
+            className="flex items-center text-stone-800 dark:text-stone-200 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
           >
-            Sesar
+            <Image
+              src="/images/logo.png"
+              alt="Quiet Code Soul Logo"
+              width={40}
+              height={40}
+              className="mr-2"
+            />
+            <span className="text-xl font-medium">Sesar</span>
           </Link>
 
           {/* Desktop Navigation */}
