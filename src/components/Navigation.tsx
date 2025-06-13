@@ -107,7 +107,7 @@ const Navigation = () => {
               height={40}
               className="mr-2"
             />
-            <span className="text-xl font-medium">Sesar</span>
+            <span className="text-xl font-medium">sesar's</span>
           </Link>
 
           {/* Desktop Navigation */}

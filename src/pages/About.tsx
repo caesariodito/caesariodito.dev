@@ -15,39 +15,39 @@ const fadeIn = {
 const About = () => {
   const timeline = [
     {
-      year: "2024",
-      title: "Present Moment",
+      year: "2025",
+      title: "Present Moment — Software Engineer",
       description:
-        "Building software with intention, growing through reflection.",
+        "Got a job, building software with intention, growing through reflection.",
       reflection: "Every day is a chance to merge wisdom with code.",
     },
     {
-      year: "2023",
-      title: "The 1% Philosophy",
+      year: "2024",
+      title: "Graduation and Grinding.",
       description:
-        "Embraced atomic habits and daily improvement over dramatic changes.",
-      reflection: "Small commits, big transformations.",
+        "Bangkit Academy, Mentorship, Advising, and Networking made to where am at now.",
+      reflection: "Discipline, small commits, and big transformations.",
+    },
+    {
+      year: "2023",
+      title: "Revolution and Evolution",
+      description:
+        "Where journaling starts, philosophy make sense, and AI entered the scene – tried to make use of it.",
+      reflection: "This is where I already felt old, but I'm actually not.",
     },
     {
       year: "2021",
-      title: "Discovery of Mindfulness",
+      title: "Coding is fun, well imo.",
       description:
-        "Started journaling and meditation practices. Everything changed.",
-      reflection: "Code became meditation. Debugging became self-reflection.",
+        "Solving problems is never been easy, but accomplishing it is a great feeling.",
+      reflection: "First dopamine hit.",
     },
     {
       year: "2020",
-      title: "First Burnout",
-      description:
-        "Learned the hard way that grinding 16-hour days wasn't sustainable.",
-      reflection: "This was my first lesson in the importance of balance.",
-    },
-    {
-      year: "2018",
       title: "The Beginning",
       description:
-        "Started my journey in computer science, drawn to the logical beauty of code.",
-      reflection: "Every problem had a solution waiting to be discovered.",
+        "Started my journey in computer science at Sanata Dharma University, coming from an accountant background.",
+      reflection: "Determination > destiny.",
     },
   ];
 
@@ -94,12 +94,13 @@ const About = () => {
                 Beyond the Code
               </h2>
               <p className="text-stone-600 dark:text-stone-300 leading-relaxed">
-                I believe that the best software comes from developers who
-                understand themselves. My daily practice includes morning
-                journaling, where I reflect on yesterday's learnings and set
-                intentions for today's work. This isn't just self-help—it's a
-                systematic approach to continuous improvement that applies to
-                both personal growth and code quality.
+                I see code the way some see poetry — as a craft shaped over
+                time, refined with intention, and meant to outlive its moment.
+                Software engineering, for me, is not just about solving
+                problems, but about listening closely: to systems, to users, to
+                that quiet inner voice asking, “How can this be better?” In
+                every pull request, there's a whisper of self-discipline; in
+                every bug, a lesson waiting to be learned.
               </p>
               <p className="text-stone-600 dark:text-stone-300 leading-relaxed">
                 Every commit I make is intentional. Every feature I build serves
