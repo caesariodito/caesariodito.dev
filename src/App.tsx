@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,7 +8,6 @@ import Navigation from "@/components/Navigation";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Projects from "./pages/Projects";
-import Philosophy from "./pages/Philosophy";
 import Tools from "./pages/Tools";
 import Journal from "./pages/Journal";
 import NotFound from "./pages/NotFound";
@@ -18,7 +16,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light" storageKey="portfolio-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="portfolio-theme">
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -29,7 +27,6 @@ const App = () => (
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/projects" element={<Projects />} />
-              <Route path="/philosophy" element={<Philosophy />} />
               <Route path="/tools" element={<Tools />} />
               <Route path="/journal" element={<Journal />} />
               <Route path="*" element={<NotFound />} />

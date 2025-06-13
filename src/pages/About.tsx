@@ -19,7 +19,7 @@ const About = () => {
       title: "Present Moment — Software Engineer",
       description:
         "Got a job, building software with intention, growing through reflection.",
-      reflection: "Every day is a chance to merge wisdom with code.",
+      reflection: "Every day is a chance to improve and grow.",
     },
     {
       year: "2024",
