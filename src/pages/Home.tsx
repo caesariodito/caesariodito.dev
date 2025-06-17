@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import { FadeIn, StaggerContainer } from "@/components/ui/motion";
-import HomeClientWrapper from "./HomeClientWrapper";
+import HomeClientWrapper from "@/components/home/HomeClientWrapper";
 
 const Home = () => {
   const principles = [
