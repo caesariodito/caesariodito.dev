@@ -138,10 +138,8 @@ const JournalExplorer = () => {
       if (selectedCategory) queryParams.append("category", selectedCategory);
       if (selectedTag) queryParams.append("tag", selectedTag);
 
-      console.log("Fetching journals with params:", queryParams.toString());
       const response = await fetch(`/api/journals?${queryParams.toString()}`);
       const data = await response.json();
-      console.log("Received journal data:", data);
 
       // Always set loading to false before processing the data
       setIsLoading(false);
@@ -178,10 +176,6 @@ const JournalExplorer = () => {
           );
           setPage((prev) => (reset ? 2 : prev + 1));
           setHasMore(uniqueEntries.length > 0);
-          console.log(
-            "Updated journal entries:",
-            reset ? data : [...journalEntries, ...uniqueEntries]
-          );
         }
       } else if (data.journals) {
         // Handle response format with journals property
@@ -203,10 +197,6 @@ const JournalExplorer = () => {
           );
           setPage((prev) => (reset ? 2 : prev + 1));
           setHasMore(uniqueEntries.length > 0);
-          console.log(
-            "Updated journal entries:",
-            reset ? data.journals : [...journalEntries, ...uniqueEntries]
-          );
         }
       }
     } catch (error) {
@@ -246,7 +236,6 @@ const JournalExplorer = () => {
 
   // Handle entry click
   const handleEntryClick = (slug: string) => {
-    console.log("Entry clicked:", slug);
     router.push(`/journals/${slug}`);
   };
 
