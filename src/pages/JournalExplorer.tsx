@@ -6,13 +6,30 @@ import { Grid, Network } from "lucide-react";
 import { JournalFrontmatter } from "@/lib/mdx";
 import { useRouter } from "next/navigation";
 import { useDebounce } from "../hooks/useDebounce";
+import dynamic from "next/dynamic";
 
 // Import modular components
 import JournalExplorerHeader from "@/components/journal-explorer/JournalExplorerHeader";
 import JournalFilters from "@/components/journal-explorer/JournalFilters";
 import GalleryView from "@/components/journal-explorer/GalleryView/GalleryView";
-import GraphView from "@/components/journal-explorer/GraphView/GraphView";
 import FilterBadges from "@/components/journal-explorer/common/FilterBadges";
+import LoadingAnimation from "@/components/journal-explorer/common/LoadingAnimation";
+
+// Import GraphView with dynamic import to avoid SSR issues
+const GraphView = dynamic(
+  () => import("@/components/journal-explorer/GraphView/GraphView"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <LoadingAnimation />
+        <p className="text-stone-600 dark:text-stone-400 mt-4">
+          Loading graph visualization...
+        </p>
+      </div>
+    ),
+  }
+);
 
 const JournalExplorer = () => {
   // Shared state for both views

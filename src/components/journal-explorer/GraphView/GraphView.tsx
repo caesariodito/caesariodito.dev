@@ -235,9 +235,9 @@ const GraphView: React.FC<GraphViewProps> = ({
     }
   }, []);
 
-  // Initialize D3 force simulation
+  // Initialize D3 force simulation - only run when d3 is loaded
   useLayoutEffect(() => {
-    // Only proceed if both SVG is mounted and we have graph data
+    // Only proceed if both SVG is mounted, d3 is loaded, and we have graph data
     if (!svgRef.current || !svgMounted || graphData.nodes.length === 0) {
       return;
     }
@@ -666,8 +666,8 @@ const GraphView: React.FC<GraphViewProps> = ({
 
   // New function to center the graph on clusters
   const centerGraphOnClusters = (
-    svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
-    zoom: d3.ZoomBehavior<Element, unknown>
+    svg: ReturnType<typeof d3.select>,
+    zoom: d3.ZoomBehavior<SVGSVGElement, unknown>
   ) => {
     if (!svgRef.current || graphData.nodes.length === 0) return;
 
@@ -677,10 +677,11 @@ const GraphView: React.FC<GraphViewProps> = ({
       if (!svgNode) return;
 
       // Get dimensions from the SVG element or use clientWidth/Height as fallback
+      const svgElement = svgNode as SVGSVGElement;
       const width =
-        svgNode.width.baseVal.value || svgRef.current.clientWidth || 800;
+        svgElement.viewBox.baseVal.width || svgRef.current.clientWidth || 800;
       const height =
-        svgNode.height.baseVal.value || svgRef.current.clientHeight || 600;
+        svgElement.viewBox.baseVal.height || svgRef.current.clientHeight || 600;
 
       // Calculate bounding box of all nodes
       let minX = Infinity,
@@ -719,6 +720,7 @@ const GraphView: React.FC<GraphViewProps> = ({
             .transition()
             .duration(750)
             .call(
+              // @ts-expect-error - D3 typing issue with zoom transform
               zoom.transform,
               d3.zoomIdentity.translate(width / 2, height / 2).scale(0.8)
             );
@@ -751,6 +753,7 @@ const GraphView: React.FC<GraphViewProps> = ({
           .transition()
           .duration(750)
           .call(
+            // @ts-expect-error - D3 typing issue with zoom transform
             zoom.transform,
             d3.zoomIdentity
               .translate(
