@@ -170,7 +170,17 @@ export function getJournalStats() {
   const uniqueDates = new Set(
     journals.map((journal) => journal.date.split("T")[0])
   );
-  const daysJournaled = uniqueDates.size;
+
+  // Calculate days journaled from Sep 21, 2023 to today
+  const startDate = new Date("2023-09-21");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Calculate the difference in days
+  const timeDiff = today.getTime() - startDate.getTime();
+  const daysSinceStart = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1; // +1 to include today
+
+  const daysJournaled = daysSinceStart;
 
   // Total entries
   const totalEntries = journals.length;
