@@ -1,6 +1,5 @@
 import { getProjectSlugs, getProjectWithContent } from "@/lib/mdx";
-import { MDXRemote } from "next-mdx-remote/rsc";
-import MDXComponents from "@/components/MDXComponents";
+import MDXClientWrapper from "@/components/MDXClientWrapper";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Calendar, Star } from "lucide-react";
 import Link from "next/link";
@@ -120,7 +119,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
 
             {/* MDX Content */}
             <article className="prose prose-sm md:prose dark:prose-invert max-w-none overflow-hidden break-words">
-              <MDXRemote source={content} components={MDXComponents} />
+              <MDXClientWrapper source={content} />
             </article>
           </div>
 

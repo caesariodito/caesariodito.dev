@@ -5,8 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Calendar, ArrowLeft, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MDXRemote } from "next-mdx-remote/rsc";
-import MDXComponents from "@/components/MDXComponents";
+import MDXClientWrapper from "@/components/MDXClientWrapper";
 
 interface JournalPageProps {
   params: {
@@ -124,7 +123,7 @@ export default function JournalPage({ params }: JournalPageProps) {
 
           {/* Journal Content area - prose styles might need to be adjusted for new container width */}
           <article className="prose prose-stone dark:prose-invert md:prose-lg lg:prose-xl prose-headings:font-light prose-headings:text-stone-800 dark:prose-headings:text-stone-100 prose-a:text-amber-600 dark:prose-a:text-amber-400 prose-code:bg-stone-100 dark:prose-code:bg-stone-800 prose-code:p-0.5 prose-code:rounded prose-code:text-sm max-w-none mx-auto">
-            <MDXRemote source={processedContent} components={MDXComponents} />
+            <MDXClientWrapper source={processedContent} />
           </article>
 
           {/* Navigation between entries (keep this unique feature) */}
