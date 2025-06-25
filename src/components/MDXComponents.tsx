@@ -15,6 +15,8 @@ import {
 } from "react";
 import { Card } from "@/components/ui/card";
 import { useLinkPreview } from "@/hooks/useLinkPreview";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
+import { ComponentType } from "react";
 
 // Utility function to unwrap paragraph children
 const unwrapParagraphs = (children: ReactNode): ReactNode => {
@@ -510,6 +512,51 @@ const WikiLink = ({ pageName, href, children }: WikiLinkProps) => {
   );
 };
 
+// Error fallback component
+const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
+  return (
+    <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg my-4">
+      <p className="text-red-600 dark:text-red-400 font-medium">
+        Error rendering component
+      </p>
+      <p className="text-sm text-red-500 dark:text-red-300 mt-1">
+        {error.message}
+      </p>
+      <button
+        onClick={resetErrorBoundary}
+        className="mt-2 px-3 py-1 bg-red-100 dark:bg-red-800 text-red-600 dark:text-red-300 text-sm rounded hover:bg-red-200 dark:hover:bg-red-700"
+      >
+        Try again
+      </button>
+    </div>
+  );
+};
+
+// Wrapper to safely render any component
+interface SafeComponentProps {
+  component: ComponentType<any> | undefined;
+  [key: string]: any;
+}
+
+const SafeComponent = ({
+  component: Component,
+  ...props
+}: SafeComponentProps) => {
+  if (!Component) {
+    return (
+      <span className="text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded">
+        Missing component
+      </span>
+    );
+  }
+
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <Component {...props} />
+    </ErrorBoundary>
+  );
+};
+
 const MDXComponents = {
   h1: (props: HeadingProps) => (
     <h1
@@ -586,6 +633,15 @@ const MDXComponents = {
   // Add the new components here
   HashtagLink,
   WikiLink,
+  // Add a wrapper for custom components to prevent undefined errors
+  wrapper: ({ components, children, ...props }) => {
+    try {
+      return <div {...props}>{children}</div>;
+    } catch (error) {
+      console.error("Error in MDX wrapper:", error);
+      return <div className="text-red-500">Error rendering content</div>;
+    }
+  },
 };
 
 export default MDXComponents;

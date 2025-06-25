@@ -16,21 +16,10 @@ const nextConfig = {
   swcMinify: true,
   images: {
     remotePatterns: [
-      { hostname: "cdn.discordapp.com" },
-      { hostname: "flowbite.s3.amazonaws.com" },
-      { hostname: "static.wikia.nocookie.net" },
-      { hostname: "**.wikia.nocookie.net" },
-      { hostname: "**.wikipedia.org" },
-      { hostname: "**.ytimg.com" },
-      { hostname: "i.ytimg.com" },
-      { hostname: "**.twimg.com" },
-      { hostname: "**.googleusercontent.com" },
-      { hostname: "**.ggpht.com" },
-      { hostname: "**.capitalfm.com" },
-      { hostname: "**.bbc.co.uk" },
-      { hostname: "**.bbc.com" },
-      { hostname: "**.nytimes.com" },
-      { hostname: "**.cnn.com" },
+      {
+        protocol: "https",
+        hostname: "**",
+      },
     ],
     domains: [],
   },
@@ -45,11 +34,31 @@ const nextConfig = {
   output: "standalone",
 
   // Configure source directories for Next.js
-  transpilePackages: [],
+  transpilePackages: ["next-mdx-remote"],
 
   // Ensure proper handling of both src/ and root directories
   webpack: (config) => {
+    // Add support for importing markdown files
+    config.module.rules.push({
+      test: /\.mdx?$/,
+      use: [
+        {
+          loader: "@mdx-js/loader",
+          /** @type {import('@mdx-js/loader').Options} */
+          options: {
+            providerImportSource: "@mdx-js/react",
+          },
+        },
+      ],
+    });
+
     return config;
+  },
+
+  // Disable static generation for problematic pages
+  experimental: {
+    // Allow dynamic rendering for these paths
+    unstable_allowDynamic: ["/projects/[slug]/**", "/journals/[slug]/**"],
   },
 };
 

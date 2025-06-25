@@ -1,11 +1,11 @@
 import { getJournalWithContent, getJournalSlugs } from "@/lib/mdx";
-import { formatDate, processContent } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Calendar, ArrowLeft, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import MDXClientWrapper from "@/components/MDXClientWrapper";
+import dynamic from "next/dynamic";
 
 interface JournalPageProps {
   params: {
@@ -37,12 +37,24 @@ export async function generateMetadata({
   }
 }
 
+// Dynamically import MDXClientWrapper with SSR disabled
+const MDXClientWrapper = dynamic(
+  () => import("@/components/MDXClientWrapper"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="animate-pulse space-y-4">
+        <div className="h-4 bg-stone-200 dark:bg-stone-700 rounded w-3/4"></div>
+        <div className="h-4 bg-stone-200 dark:bg-stone-700 rounded w-1/2"></div>
+        <div className="h-4 bg-stone-200 dark:bg-stone-700 rounded w-5/6"></div>
+      </div>
+    ),
+  }
+);
+
 export default function JournalPage({ params }: JournalPageProps) {
   try {
     const { frontmatter, content } = getJournalWithContent(params.slug);
-
-    // Process content to convert hashtags and wiki links to clickable elements
-    const processedContent = processContent(content);
 
     return (
       <main className="pt-16 md:pt-20 pb-16">
@@ -123,7 +135,10 @@ export default function JournalPage({ params }: JournalPageProps) {
 
           {/* Journal Content area - prose styles might need to be adjusted for new container width */}
           <article className="prose prose-stone dark:prose-invert md:prose-lg lg:prose-xl prose-headings:font-light prose-headings:text-stone-800 dark:prose-headings:text-stone-100 prose-a:text-amber-600 dark:prose-a:text-amber-400 prose-code:bg-stone-100 dark:prose-code:bg-stone-800 prose-code:p-0.5 prose-code:rounded prose-code:text-sm max-w-none mx-auto">
-            <MDXClientWrapper source={processedContent} />
+            <MDXClientWrapper
+              source={content}
+              processContentBeforeRendering={true}
+            />
           </article>
 
           {/* Navigation between entries (keep this unique feature) */}
