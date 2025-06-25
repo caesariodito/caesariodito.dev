@@ -1,0 +1,68 @@
+---
+title: "Guidance to enable hotspot in EndeavourOS"
+date: "2024-04-05"
+category: "Wikis"
+excerpt: "As a beginner in the linux world, I often forget how do I solve things, so then this thing exist."
+mood: "👌"
+growth: "READ."
+tags: ["blog", "linux", "arch", "OS", "guide"]
+wordCount: 726
+---
+
+# Hotspot in EndeavourOS
+
+Well it's my first blog post but not really my first content.
+
+Anyways…
+
+Today am planning to do a simple guide because one of my friends asked to. It's @vianneynara, a fellow linux enjoyer, and really loves emilia. Check him out, he's also a good developer.
+
+Without further ado, let's deep dive into the content.
+
+So as I said in the title, this is a comprehensive guide to enable wifi hotspot from your laptop running in linux. In my case, I use EndeavourOS which one of the friendly arch-based distros available out there.
+
+Disclaimer, I'm still a noob on this linux distro – workspace world, so everything that I did are based on forum discussions, documentations, and every source available on the internet. I haven't got the time to fully delve into the linux operating system to understand everything that happens behind the process. In this post, I will tell my short journey to solve the problems that I've encountered to enable this feature in linux.
+
+So at first, I just simply google "hotspot arch" and stumbled upon a arch linux wiki page discussing about software access point. As I read the wiki, I see the available tools that can achieve hotspot feature and the tools are:
+
+    linux-wifi-hotspot
+    RADIUS
+
+I only explored on the linux-wifi-tools package because I see it well-maintained on the github repo. The commits are just some few weeks ago.
+
+Without questioning any further, I install that package with yay -S linux-wifi-hotspot and enter all the necessary prompt and everything.
+
+After finished installing the package, I just straight trying the GUI via wihotspot and try to create and share connection with my ethernet and wifi enabled. The connection created easily and I try to connect it with my android phone, but it seems to have an error. My phone doesn't seem able to take any IP address and the GUI shows that the IP address of my phone is \*, which I believe it's not registered or it can grab any IP from the connection (this is just some random thoughts btw, not so sure too).
+
+And then…
+
+the journey of searching more documentations, forum-discussions begin…
+
+I searched the official forum for EndeavourOS, github, everything and here's some of the recap that I can conclude from my research:
+
+    Unable to connect one WiFi hotspot, says that:
+
+        Possibly it is systemd-resolved service which was disabled (also not running by default). Starting/enabling it solved the issue for me.
+
+    so I started the service and try to connect with my phone again but it still doesn't work.
+    Won’t connect to internet, issues from github seems ignored.
+    Wifi bridge, says that you can't share the connection if you connected to WiFi. So I guess you are able to do hotspot sharing if you connected to ethernet. I haven't tested this so idk.
+    No IP Allocated Error, and finally I stumbled upon this closed github issue discussion, saying that:
+
+        Okay, I might have your fix @incrypto32! At least this worked for me, and I have no clue why. A simple removal (or purge, depending on your package manager) of dnsmasq and iptables did it for me.
+
+        @arimgibson Thanks for Fix
+
+        On Fedora 35, removal of iptables-nft(It removed packages related to firewalld) fixes ip issue, also Allow internet access to connected devices
+
+        Edit: @lakinduakash Firewalld is causing whole problem , simply disabling it fixes problem, I don't know how to allow connections for wihotspot in firewalld
+
+        For adding firewall rules instructions are available at #166
+
+    They are saying that removing the iptables-nft packages will solve the problem. I tried that but the other package are dependant to that one so I tried the 2nd solution which is disabling firewalld via sudo systemctl stop firewalld solves the problem. You can also try to change the config of the firewalld with this command: sudo firewall-cmd --permanent --zone=public --add-port=67/udp and sudo firewall-cmd --reload.
+
+I also haven't done more research on the firewalld package and still unable to answer the why? question on this topic. Well I assume the package is conflicting on the same port or maybe preventing the linux-tools-hotspot package to behave correctly.
+
+So yea, for me, the solution is to disabling firewalld or changing the config of the firewalld package.
+
+Hope this helps my friend – nara, and fellow readers that I may not have. kekw.
