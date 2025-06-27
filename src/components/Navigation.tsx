@@ -15,29 +15,75 @@ const Navigation = () => {
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const journalDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileProjectsRef = useRef<HTMLDivElement>(null);
+  const mobileJournalRef = useRef<HTMLDivElement>(null);
 
   // After mounting, we have access to the theme
   useEffect(() => {
     setMounted(true);
+
+    // Check if we're on desktop
+    const checkIfDesktop = () => {
+      setIsDesktop(window.innerWidth >= 768); // md breakpoint in Tailwind
+    };
+
+    // Initial check
+    checkIfDesktop();
+
+    // Add resize listener
+    window.addEventListener("resize", checkIfDesktop);
+
+    return () => {
+      window.removeEventListener("resize", checkIfDesktop);
+    };
   }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setProjectsDropdownOpen(false);
-      }
+      // Only handle desktop dropdowns when in desktop mode
+      if (isDesktop) {
+        if (
+          dropdownRef.current &&
+          !dropdownRef.current.contains(event.target as Node)
+        ) {
+          setProjectsDropdownOpen(false);
+        }
 
-      if (
-        journalDropdownRef.current &&
-        !journalDropdownRef.current.contains(event.target as Node)
-      ) {
-        setJournalDropdownOpen(false);
+        if (
+          journalDropdownRef.current &&
+          !journalDropdownRef.current.contains(event.target as Node)
+        ) {
+          setJournalDropdownOpen(false);
+        }
+      } else {
+        // Mobile dropdown handling
+        if (
+          mobileProjectsRef.current &&
+          !mobileProjectsRef.current.contains(event.target as Node) &&
+          projectsDropdownOpen
+        ) {
+          // Don't close if clicking on the toggle button
+          const target = event.target as HTMLElement;
+          if (!target.closest("button")?.textContent?.includes("Projects")) {
+            setProjectsDropdownOpen(false);
+          }
+        }
+
+        if (
+          mobileJournalRef.current &&
+          !mobileJournalRef.current.contains(event.target as Node) &&
+          journalDropdownOpen
+        ) {
+          // Don't close if clicking on the toggle button
+          const target = event.target as HTMLElement;
+          if (!target.closest("button")?.textContent?.includes("Journal")) {
+            setJournalDropdownOpen(false);
+          }
+        }
       }
     };
 
@@ -45,7 +91,7 @@ const Navigation = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [isDesktop, projectsDropdownOpen, journalDropdownOpen]);
 
   // Close dropdown when changing routes
   useEffect(() => {
@@ -219,9 +265,20 @@ const Navigation = () => {
             <div className="flex flex-col space-y-3 pt-4">
               {navItems.map((item) =>
                 item.hasDropdown ? (
-                  <div key={item.name} className="space-y-2">
+                  <div
+                    key={item.name}
+                    className="space-y-2 relative"
+                    ref={
+                      item.name === "Projects"
+                        ? mobileProjectsRef
+                        : item.name === "Journal"
+                        ? mobileJournalRef
+                        : undefined
+                    }
+                  >
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         if (item.name === "Projects") {
                           setProjectsDropdownOpen(!projectsDropdownOpen);
                         } else if (item.name === "Journal") {
@@ -248,13 +305,21 @@ const Navigation = () => {
                     </button>
                     {((item.name === "Projects" && projectsDropdownOpen) ||
                       (item.name === "Journal" && journalDropdownOpen)) && (
-                      <div className="pl-4 space-y-2 mt-1">
+                      <div className="pl-4 space-y-2 mt-1 relative z-10">
                         {item.dropdownItems?.map((dropdownItem) => (
                           <Link
                             key={dropdownItem.name}
                             href={dropdownItem.path}
-                            onClick={() => setIsOpen(false)}
-                            className={`block text-sm ${
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsOpen(false);
+                              if (item.name === "Projects") {
+                                setProjectsDropdownOpen(false);
+                              } else if (item.name === "Journal") {
+                                setJournalDropdownOpen(false);
+                              }
+                            }}
+                            className={`block text-sm py-1 px-2 rounded hover:bg-stone-100 dark:hover:bg-stone-700 ${
                               pathname === dropdownItem.path
                                 ? "text-amber-600 dark:text-amber-400"
                                 : "text-stone-500 dark:text-stone-400"
