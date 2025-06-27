@@ -266,13 +266,7 @@ const Journal = () => {
                   viewport={{ once: true }}
                   transition={{ delay: 0.4, duration: 0.5 }}
                 >
-                  {[
-                    "mindfulness",
-                    "work-life-balance",
-                    "productivity",
-                    "coding",
-                    "focus",
-                  ].map((tag, index) => (
+                  {["blog", "thoughts", "journey"].map((tag, index) => (
                     <motion.div
                       key={tag}
                       initial={{ opacity: 0, scale: 0.8 }}
