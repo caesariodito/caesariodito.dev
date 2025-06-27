@@ -4,8 +4,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { FadeIn, StaggerContainer } from "@/components/ui/motion";
+import { useState, useEffect } from "react";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -38,6 +39,25 @@ interface HomeClientWrapperProps {
 }
 
 const HomeClientWrapper = ({ principles }: HomeClientWrapperProps) => {
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+
+  const titleWords = ["clarity", "&", "intention"];
+  const codeSnippets = [
+    "{ growth: '1%', mindset: 'zen', code: 'clean' }",
+    "// Finding clarity in complexity",
+    "const newPerspective = (oldProblem) => {...}",
+    "db.thoughts.find({ tags: 'inspiration' })",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTextIndex((prevIndex) => (prevIndex + 1) % codeSnippets.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [codeSnippets.length]);
+
+  const particles = Array.from({ length: 30 });
+
   return (
     <main className="pt-20 pb-16">
       {/* Hero Section */}
@@ -54,11 +74,31 @@ const HomeClientWrapper = ({ principles }: HomeClientWrapperProps) => {
                 Coding with
                 <motion.span
                   className="block text-amber-600 dark:text-amber-400 font-medium"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                      opacity: 1,
+                      transition: {
+                        staggerChildren: 0.2,
+                        delayChildren: 0.3,
+                      },
+                    },
+                  }}
                 >
-                  clarity & intention
+                  {titleWords.map((word, index) => (
+                    <motion.span
+                      key={index}
+                      variants={{
+                        hidden: { opacity: 0, x: -20 },
+                        visible: { opacity: 1, x: 0 },
+                      }}
+                      className="inline-block mr-4"
+                    >
+                      {word}
+                    </motion.span>
+                  ))}
                 </motion.span>
               </h1>
               <motion.p
@@ -102,39 +142,60 @@ const HomeClientWrapper = ({ principles }: HomeClientWrapperProps) => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7 }}
           >
-            <div className="w-full h-96 bg-gradient-to-br from-amber-100 to-stone-200 dark:from-amber-900/20 dark:to-stone-800 rounded-3xl relative overflow-hidden">
+            <div className="w-full h-96 bg-gradient-to-br from-amber-100 to-stone-200 dark:from-amber-900/20 dark:to-stone-800 rounded-3xl relative overflow-hidden shadow-xl">
               <div className="absolute inset-0 bg-gradient-to-br from-transparent via-amber-200/20 to-stone-300/20 dark:from-transparent dark:via-amber-800/10 dark:to-stone-700/20"></div>
-              <motion.div
-                className="absolute top-8 right-8 w-3 h-3 bg-amber-400 rounded-full animate-pulse"
-                animate={{
-                  boxShadow: [
-                    "0 0 0px rgba(251, 191, 36, 0.4)",
-                    "0 0 20px rgba(251, 191, 36, 0.7)",
-                    "0 0 0px rgba(251, 191, 36, 0.4)",
-                  ],
-                }}
-                transition={{ duration: 2, repeat: Infinity }}
-              ></motion.div>
-              <motion.div
-                className="absolute bottom-12 left-8 w-2 h-2 bg-stone-400 rounded-full"
-                animate={{
-                  boxShadow: [
-                    "0 0 0px rgba(120, 113, 108, 0.4)",
-                    "0 0 15px rgba(120, 113, 108, 0.7)",
-                    "0 0 0px rgba(120, 113, 108, 0.4)",
-                  ],
-                }}
-                transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
-              ></motion.div>
+
+              {/* Particle Animation */}
+              {particles.map((_, i) => {
+                const size = Math.random() * 2 + 1;
+                const top = `${Math.random() * 100}%`;
+                const left = `${Math.random() * 100}%`;
+                const duration = Math.random() * 5 + 3;
+                const delay = Math.random() * 3;
+                return (
+                  <motion.div
+                    key={i}
+                    className="absolute bg-amber-200/80 dark:bg-amber-400/30 rounded-full"
+                    style={{
+                      width: `${size}px`,
+                      height: `${size}px`,
+                      top,
+                      left,
+                    }}
+                    animate={{
+                      x: [0, Math.random() * 30 - 15, 0],
+                      y: [0, Math.random() * 30 - 15, 0],
+                      scale: [1, Math.random() * 0.5 + 0.5, 1],
+                    }}
+                    transition={{
+                      duration,
+                      delay,
+                      repeat: Infinity,
+                      repeatType: "mirror",
+                      ease: "easeInOut",
+                    }}
+                  />
+                );
+              })}
+
               <motion.div
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1, duration: 1 }}
               >
-                <div className="text-stone-600 dark:text-stone-300 text-sm font-mono">
-                  {"{ growth: '1%', mindset: 'zen', code: 'clean' }"}
-                </div>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentTextIndex}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.5 }}
+                    className="text-stone-600 dark:text-stone-300 text-sm font-mono"
+                  >
+                    {codeSnippets[currentTextIndex]}
+                  </motion.div>
+                </AnimatePresence>
               </motion.div>
             </div>
           </motion.div>
@@ -171,14 +232,18 @@ const HomeClientWrapper = ({ principles }: HomeClientWrapperProps) => {
           </motion.p>
         </motion.div>
 
-        <StaggerContainer className="space-y-8" staggerDelay={0.15}>
+        <StaggerContainer
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          staggerDelay={0.15}
+        >
           {principles.map((principle, index) => (
-            <FadeIn key={index} direction="left">
+            <FadeIn key={index}>
               <motion.div
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ scale: 1.02, y: -5 }}
                 transition={{ duration: 0.2 }}
+                className="h-full"
               >
-                <Card className="p-8 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 hover:shadow-lg transition-all duration-300">
+                <Card className="h-full p-8 bg-white/50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 hover:shadow-lg transition-all duration-300 flex flex-col">
                   <div className="flex items-start space-x-6">
                     <motion.div
                       className="text-4xl"
@@ -193,8 +258,8 @@ const HomeClientWrapper = ({ principles }: HomeClientWrapperProps) => {
                     >
                       {principle.icon}
                     </motion.div>
-                    <div className="flex-1 space-y-4">
-                      <div>
+                    <div className="flex-1 space-y-4 flex flex-col">
+                      <div className="flex-grow">
                         <h3 className="text-2xl font-medium text-stone-800 dark:text-stone-200 mb-2">
                           {principle.title}
                         </h3>
@@ -215,31 +280,40 @@ const HomeClientWrapper = ({ principles }: HomeClientWrapperProps) => {
       </section>
 
       {/* Call to Action */}
-      <section className="max-w-4xl mx-auto px-6 py-24 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="mb-10"
-        >
-          <h2 className="text-3xl font-light text-stone-800 dark:text-stone-100 mb-6">
-            Interested in working together?
-          </h2>
-          <p className="text-xl text-stone-600 dark:text-stone-300 mb-8 max-w-3xl mx-auto">
-            I'm currently open to new opportunities where I can apply my
-            technical skills and mindful approach to create meaningful digital
-            experiences.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/projects">
-              <Button className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-6 rounded-full text-lg transition-all duration-300 hover:scale-105">
-                Explore My Work
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-        </motion.div>
+      <section className="max-w-4xl mx-auto px-6 py-24">
+        <div className="bg-gradient-to-r from-amber-50 to-orange-100 dark:from-stone-800 dark:to-stone-900/70 p-12 rounded-3xl text-center shadow-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl font-light text-stone-800 dark:text-stone-100 mb-6">
+              Interested in working together?
+            </h2>
+            <p className="text-xl text-stone-600 dark:text-stone-300 mb-8 max-w-3xl mx-auto">
+              I'm currently open to new opportunities where I can apply my
+              technical skills and mindful approach to create meaningful digital
+              experiences.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href="/projects">
+                <Button className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-6 rounded-full text-lg transition-all duration-300 hover:scale-105">
+                  Explore My Work
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href="/about">
+                <Button
+                  variant="outline"
+                  className="border-stone-300 dark:border-stone-600 px-8 py-6 rounded-full text-lg hover:bg-stone-50 dark:hover:bg-stone-800 transition-all duration-300"
+                >
+                  Get In Touch
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
       </section>
     </main>
   );
